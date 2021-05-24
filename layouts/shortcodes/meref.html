@@ -1,0 +1,50 @@
+
+
+
+{{/* 
+
+  Params: "firstname middlename lastname" birthdate deathdate 
+  
+  Looking for file with the naming convention:
+    - lastname-firstname-middlename_birthyear.md
+  
+    Years given as YYYY.
+
+*/}}
+
+{{ $fullname := .Get 0 }}
+{{ $birthdate :=  default "?" (string (.Get 1)) }}
+{{ $deathdate := default "?" (string (.Get 2)) }}
+
+{{ $normal_name := $fullname }}
+{{ $name_parts := split $fullname " "}}
+{{ if eq (len $name_parts) 2 }} 
+  {{ $normal_name = print (index $name_parts 1) "-" (index $name_parts 0) }} 
+{{ end }}
+{{ if eq (len $name_parts) 3 }} 
+  {{ $normal_name = print (index $name_parts 2) "-" (index $name_parts 0) "-" (index $name_parts 1) }} 
+{{ end }}
+
+
+{{ with $birthdate }}
+  {{ $normal_name = print $normal_name "_" $birthdate }}
+{{ end }}
+
+{{ $normal_name = print $normal_name ".md" }}
+
+{{ $fileref := path.Join "people" $normal_name }}
+
+{{ $display_date := "" }}
+{{ if or $birthdate $deathdate }}
+  {{ $display_date = print " (" $birthdate  " - " $deathdate ")" }}
+{{ end }}
+
+{{ $display_name := print (title $fullname) $display_date }}
+
+{{ if fileExists $fileref -}}
+  found it! <a href="{{ relref . $fileref }}"> {{ print $display_name }} </a>
+{{ else }}  
+  {{ print $display_name }}
+{{- end }}
+
+

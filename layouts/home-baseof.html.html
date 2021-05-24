@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ .Site.Title }}</title>
+    <style>
+
+        html {
+            min-height: 100%;
+            background-image: url({{ "images/background.jpg" | relURL }});
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+      
+
+        div#home_menu ul {
+            list-style-type:none;
+            padding:0px;
+            margin:0px;
+        }
+
+        div#home_menu li {
+            list-style:none;
+            background-image:none;
+            background-repeat:none;
+            background-position:0; 
+        }
+
+        a {
+            /*Font-family: Candara, Calibri, Segoe, Segoe UI, Optima, Arial, sans-serif;*/
+            font-family: Optima, Candara, Calibri, Arial, sans-serif;;
+            font-size: 2rem;
+            font-weight: bold;
+            color: black;
+        }
+
+        img {
+            width: 100%;
+            height: auto; 
+            border: 0; 
+            -ms-interpolation-mode: bicubic
+        }
+
+          
+        div#home_logo {
+            position: fixed;
+            bottom: 20%;
+            left: 10%;
+            width: 60%
+        }
+
+        /* go bigger on monile */
+        @media only screen and (max-width: 480px) {
+            div#main {
+            width: 90%;
+            } 
+        }
+
+    </style>
+  </head>
+  
+  <body>
+
+    <div id="home_menu">
+        {{ range .Site.Sections }}
+            <li><a href="{{ .Permalink }}">{{ title .Type }}</a></li>
+        {{ end }}
+    </div>
+
+    <div id="home_logo">
+        <a href="{{ relref . "/people/mills-mary-emily_1861" }}">
+        <img src="{{ "images/logo.svg" | relURL }}">
+        </a>
+    </div>
+
+  </body>
+</html>

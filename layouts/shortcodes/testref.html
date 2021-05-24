@@ -1,0 +1,6 @@
+
+
+{{ $fullname := .Get 0 }}
+{{ $birthdate := string (.Get 1) }}
+{{ $deathdate := string (.Get 2) }}
+anything: {{ print $deathdate }}
