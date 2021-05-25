@@ -7,7 +7,7 @@ $accent-color2:      {{ .Site.Params.accent-color2 | default "#ebaf36" }}       
 $active-link-color:  {{ .Site.Params.active-link-color | default "white" }}       !default;
 $visited-link-color: {{ .Site.Params.visited-link-color | default "#ebaf36" }}    !default;
 
-$font-family: Optima, Candara, Calibri, Arial, sans-serif;
+$font-family: {{ .Site.Params.font-family | default "Optima, Candara, Calibri, Arial, sans-serif" }}    !default;
 
 /**
  * Vertical rhythm by Syncope
