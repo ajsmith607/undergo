@@ -1,11 +1,11 @@
 
-$background-color:   {{ .Site.Params.background-color | default "#554B45" }}      !default;
-$subtle-back-color:  {{ .Site.Params.subtle-back-color | default "#554B45" }}     !default;
-$color:              {{ .Site.Params.foreground-color | default "white" }}        !default;
-$accent-color:       {{ .Site.Params.accent-color | default "#ebaf36" }}          !default;
-$accent-color2:      {{ .Site.Params.accent-color2 | default "#ebaf36" }}         !default;
-$active-link-color:  {{ .Site.Params.active-link-color | default "white" }}       !default;
-$visited-link-color: {{ .Site.Params.visited-link-color | default "#ebaf36" }}    !default;
+$background-color:   {{ .Site.Params.backgroundColor | default "#554B45" }}      !default;
+$subtle-back-color:  {{ .Site.Params.subtleBackColor | default "#554B45" }}     !default;
+$color:              {{ .Site.Params.foregroundColor | default "white" }}        !default;
+$accent-color:       {{ .Site.Params.accentColor | default "#ebaf36" }}          !default;
+$accent-color2:      {{ .Site.Params.accentColor2 | default "#ebaf36" }}         !default;
+$active-link-color:  {{ .Site.Params.activeLinkColor | default "white" }}       !default;
+$visited-link-color: {{ .Site.Params.visitedLinkColor | default "#ebaf36" }}    !default;
 
 $font-family: {{ .Site.Params.font-family | default "Optima, Candara, Calibri, Arial, sans-serif" }}    !default;
 
