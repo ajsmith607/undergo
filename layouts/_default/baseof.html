@@ -14,7 +14,7 @@
 	{{ if hugo.IsProduction }}
 	{{ $css = $css | minify | fingerprint | resources.PostProcess }}
 	{{ end }}
-	<link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity" }}/>
+	<link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
 
 	<title>{{ .Title }}</title>
 	{{ with .Site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
