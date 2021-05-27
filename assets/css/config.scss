@@ -1,0 +1,10 @@
+
+$background-color:   {{ .Site.Params.customStyles.backgroundColor    | default "#554B45" }}    !default;
+$subtle-back-color:  {{ .Site.Params.customStyles.subtleBackColor    | default "#554B45" }}    !default;
+$color:              {{ .Site.Params.customStyles.foregroundColor    | default "white" }}      !default;
+$accent-color:       {{ .Site.Params.customStyles.accentColor        | default "#ebaf36" }}    !default;
+$accent-color2:      {{ .Site.Params.customStyles.accentColor2       | default "#ebaf36" }}    !default;
+$active-link-color:  {{ .Site.Params.customStyles.activeLinkColor    | default "white" }}      !default;
+$visited-link-color: {{ .Site.Params.customStyles.visitedLinkColor   | default "#ebaf36" }}    !default;
+
+$font-family:        {{ .Site.Params.customStyles.fontFamily         | default "Optima, Candara, Calibri, Arial, sans-serif" }}    !default;
