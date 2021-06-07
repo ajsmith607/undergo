@@ -76,6 +76,14 @@ hr {
   border-radius: 5px;
 }
 
+nav {
+  background: $subtle-back-color;
+  margin: 16px; 
+  padding: 3px 1em 3px;
+  width: 50%;
+  min-width: 250px;
+}
+
 img, iframe, video { 
     max-width: 100%; 
     width: auto\9; 

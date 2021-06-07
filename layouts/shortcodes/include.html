@@ -1,6 +1,5 @@
 {{ $filename := .Get 0  }}
-{{ $files := .Page.Resources.Match $filename  }}
-{{ $file := (index $files 0).Content  }}
+{{ $file := (.Page.Resources.GetMatch $filename).Content  }}
 
 {{ if strings.HasSuffix $filename ".html" }}
 
