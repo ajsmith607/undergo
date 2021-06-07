@@ -1,0 +1,13 @@
+{{ $filename := .Get 0  }}
+{{ $files := .Page.Resources.Match $filename  }}
+{{ $file := (index $files 0).Content  }}
+
+{{ if strings.HasSuffix $filename ".html" }}
+
+{{  $file | safeHTML }}
+
+{{ else if strings.HasSuffix $filename ".md" }}
+
+{{  $file | markdownify  }}
+
+{{ end }}

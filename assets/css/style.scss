@@ -69,9 +69,6 @@ hr {
   color: $accent-color;
 }
 
-.h1 { font-size: 1.1em; }
-.menu, .article-meta, footer { text-align: center; }
-
 .menu { padding: 0; }
 .menu li { display: inline-block; }
 .article-meta, .menu a {
@@ -94,6 +91,18 @@ blockquote {
   background: $subtle-back-color;
   border-left: 5px solid $active-link-color;
   padding: 3px 1em 3px;
+  margin: 16px;
+}
+
+figure {
+  padding-left: 0;
+  margin-left: 0;
+}
+
+figcaption, figure footer{
+  padding-left: 3em;
+  margin-top: 2em;
+  font-size: 90%;
 }
 
 table {
