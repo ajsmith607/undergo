@@ -5,10 +5,10 @@
 {{ $dims := $.Site.Params.ImageResize | default "800x"}}
 
 <figure>
-    
+
 {{- $imagefile := .Page.Resources.GetMatch $filename -}}
 {{  $image := $imagefile.Resize $dims }}
-<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}">
+<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $citation}} ">
 
 {{ $dirFile := path.Split $filename }}
 {{ $basename := index (split $dirFile.File "." ) 0 }}
@@ -18,7 +18,10 @@
 <blockquote>{{ $mdfile.Content  | markdownify  }}</blockquote>
 {{ end }}
 
-<figcaption>— <cite>{{ $citation }}</cite></figcaption>
+<figcaption>
+    — <cite>{{ $citation }}</cite>
+    <a href="{{ $filename }}">View full size.</a>
+</figcaption>
 
 {{ .Inner }}
 
