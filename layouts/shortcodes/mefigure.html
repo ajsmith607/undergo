@@ -1,8 +1,9 @@
 
 {{ $filename := .Get 0  }}
 {{ $citation := .Get 1  }}
+{{ $width    := .Get 2  }}
 
-{{ $dims := $.Site.Params.ImageResize | default "800x"}}
+{{ $dims := $width | default ($.Site.Params.ImageResize | default "800x") }}
 
 <figure>
 
@@ -19,8 +20,8 @@
 {{ end }}
 
 <figcaption>
-    — <cite>{{ $citation }}</cite>
-    <a href="{{ $filename }}">View full size.</a>
+    {{ if $citation }}— <cite>{{ $citation }}</cite>{{ end }}
+    <a href="{{ $filename }}">View largest available size.</a>
 </figcaption>
 
 {{ .Inner }}
