@@ -20,8 +20,8 @@
 {{ end }}
 
 <figcaption>
-    {{ if $citation }}— <cite>{{ $citation }}</cite>{{ end }}
-    <a href="{{ $filename }}">View largest available size.</a>
+{{ if $citation }}— <cite>{{ $citation | markdownify }}</cite>{{ end }}
+<a href="{{ $filename }}">View largest available size.</a>
 </figcaption>
 
 {{ .Inner }}

@@ -100,6 +100,7 @@ blockquote {
   border-left: 5px solid $active-link-color;
   padding: 3px 1em 3px;
   margin: 16px;
+  hyphens: none;
 }
 
 figure {
@@ -107,10 +108,17 @@ figure {
   margin-left: 0;
 }
 
-figcaption, figure footer{
+figcaption, figure footer {
   padding-left: 3em;
-  margin-top: 2em;
   font-size: 90%;
+}
+
+figure footer {
+  margin-top: 1.5em;
+}
+
+figcaption {
+  margin-top: 0;
 }
 
 table {
