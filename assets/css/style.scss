@@ -105,6 +105,11 @@ blockquote {
 figure {
   padding-left: 0;
   margin-left: 0;
+  padding-bottom: 2em;
+}
+
+figure img {
+  margin-bottom: 0;
 }
 
 figcaption, figure footer {
