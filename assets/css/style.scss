@@ -68,6 +68,10 @@ hr {
   color: $accent-color;
 }
 
+ul {
+  margin-top: 0;
+} 
+
 .menu { padding: 0; }
 .menu li { display: inline-block; }
 .article-meta, .menu a {
@@ -105,7 +109,7 @@ blockquote {
 figure {
   padding-left: 0;
   margin-left: 0;
-  padding-bottom: 2em;
+  padding-bottom: 1em;
 }
 
 figure img {
