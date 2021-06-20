@@ -68,7 +68,7 @@ hr {
   color: $accent-color;
 }
 
-ul {
+footer ul {
   margin-top: 0;
 } 
 
@@ -130,12 +130,13 @@ figcaption {
 }
 
 table {
+  width: 100%;
   margin: auto;
   border-top: 1px solid $active-link-color;
   border-bottom: 1px solid $active-link-color;
 }
 table thead th { border-bottom: 1px solid $active-link-color }
-th, td { padding: 5px; }
+th, td { padding: 5px;}
 thead, tfoot, tr:nth-child(even) { background: $subtle-back-color; }
 
 

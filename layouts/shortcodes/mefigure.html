@@ -19,7 +19,8 @@
 {{ $mdfilepath := printf "%s%s%s" $dirFile.Dir $basename ".md" }}
 {{ $mdfile := .Page.Resources.GetMatch $mdfilepath }}
 {{ if $mdfile }}
-<blockquote>{{ $mdfile.Content  | markdownify  }}</blockquote>
+{{ $content := $mdfile.Content }}
+{{ with $content }}<blockquote>{{ $content  | markdownify  }}</blockquote>{{ end }}
 {{ end }}
 
 <figcaption>
