@@ -1,0 +1,12 @@
+
+{{ $citation := .Get 0  }}
+
+<figure>
+
+{{ .Inner }}
+
+<figcaption>
+{{ if $citation }}— <cite>{{ $citation | markdownify }}</cite>{{ end }}
+</figcaption>
+
+</figure>

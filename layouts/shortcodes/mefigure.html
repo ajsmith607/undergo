@@ -5,7 +5,7 @@
 
 {{ $dims := printf "%sx" $maxwidth }}
 
-<figure>
+<figure style="max-width: {{ $maxwidth }}px;">
 
 {{- $image := .Page.Resources.GetMatch $filename -}}
 {{ with $image }}
@@ -24,7 +24,7 @@
 {{ end }}
 
 <figcaption>
-{{ if $citation }}— <cite>{{ $citation | markdownify }}</cite>{{ end }}
+{{ if $citation }}— <cite>{{ $citation | markdownify }}</cite>&nbsp;{{ end }}
 <a href="{{ $filename }}">View largest available size.</a>
 </figcaption>
 
