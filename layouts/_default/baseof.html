@@ -2,8 +2,9 @@
 <html lang="{{ .Site.LanguageCode | default "en-us" }}">
 <head>
 	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name=”robots” content="index, follow">
 
 	<script
   src="https://code.jquery.com/jquery-3.6.0.slim.min.js"
@@ -18,10 +19,15 @@
 	{{ $css := slice $configCSS $baseCSS $customCSS | resources.Concat "css/style.scss" }}
 	{{ $css = $css | resources.ExecuteAsTemplate "css/style.scss" . |  toCSS }}
 
+	{{ range .AlternativeOutputFormats -}}
+    {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
+{{ end -}}
+
 	{{ if hugo.IsProduction }}
 		{{ $css = $css | minify | fingerprint | resources.PostProcess }}
 	{{ end }}
 	<link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
+	<link rel="stylesheet" media="print" href="print.css">
 
 	<title>{{ .Title }}</title>
 	{{ with .Site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
@@ -33,5 +39,16 @@
 	{{ partial "header" . }}
 	{{ block "main" . }}{{ end }}
 	{{ partial "footer" . }}
+
+	{{ with .Site.Params.analyticsid -}}	
+<!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-8FWTQLRQHV"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  {{ printf `gtag('config', '%s');` . }}
+</script>	
+	{{- end }}
 </body>
 </html> 
