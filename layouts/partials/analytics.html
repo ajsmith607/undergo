@@ -6,7 +6,7 @@
 window.dataLayer = window.dataLayer || [];
 function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
-{{ safeHTML (printf "gtag('config', '%s');" .) }}
+{{ safeHTML (printf `gtag('config', '%s');` .) }}
 </script>	
 {{- end }}
 {{- end }}
