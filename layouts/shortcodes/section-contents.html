@@ -10,8 +10,8 @@ jQuery(document).ready(function () {
 
     var newLine, el, title, link;
 
-    $("{{ $section }}").nextUntil("{{ $sectionLevel }}").filter("{{ $level }}").each(function() {
-    
+    $("{{ $section }}").nextUntil("{{ $sectionLevel }}").find("{{ $level }}").each(function() {
+      
       el = $(this);
       title = el.text();
       link = "#" + el.attr("id");
