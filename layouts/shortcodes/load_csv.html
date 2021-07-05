@@ -1,0 +1,19 @@
+
+{{ $filename := .Get 0  }}
+{{ $name := .Get 1  }}
+
+{{ $csv := getCSV "," $filename }}
+
+{{ $headerRow := index $csv 0 }}
+{{ $datarows := after 1 $csv }}
+
+{{ $mappeddata := slice }}
+{{ range $i, $row := $datarows }}
+  {{ $mappedrow := dict }}
+  {{ range $j, $rowlabel := $headerRow }}
+    {{ $mappedrow = merge $mappedrow (dict $rowlabel (index $row $j)) }}
+  {{ end }}
+  {{ $mappeddata = $mappeddata | append $mappedrow }}
+{{ end }}
+
+{{ .Page.Scratch.Set $name $mappeddata }}

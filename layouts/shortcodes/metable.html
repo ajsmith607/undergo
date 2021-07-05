@@ -1,0 +1,54 @@
+
+{{ $filename := .Get 0  }}
+{{ $id := .Get 1  }}
+{{ $cols := .Get 2 }}
+{{ $citation := .Get 3 }}
+{{ $wherekey := .Get 4 }}
+{{ $whereop := .Get 5 }}
+{{ $wherematch := .Get 6 }}
+
+{{ $csv := getCSV "," $filename }}
+
+{{ $headerRow := index $csv 0 }}
+{{ $datarows := after 1 $csv }}
+
+{{ $data := slice }}
+{{ range $i, $row := $datarows }}
+  {{ $mappedrow := dict }}
+  {{ range $j, $rowlabel := $headerRow }}
+    {{ $mappedrow = merge $mappedrow (dict $rowlabel (index $row $j)) }}
+  {{ end }}
+  {{ $data = $data | append $mappedrow }}
+{{ end }}
+
+{{ with (and $wherekey $whereop ) }}
+    {{ $data = where $data $wherekey $whereop $wherematch }}
+{{ end }}
+
+{{ with $data }}
+<table id="{{ $id }}"> 
+<tr> 
+    {{ $includecols := split $cols "," }}
+    {{ range $includecols }} 
+<th>
+        {{ . | humanize }}</th> 
+    {{ end }} 
+</tr>
+    {{ range $row := . }}
+<tr>
+        {{ range $includecols }} 
+<td>
+            {{ index $row . }}</td>
+        {{ end }}</tr>
+    {{ end }}
+  {{ with $citation }}<caption>— <cite>{{ . | markdownify }}</caption>{{ end }}
+</table>
+{{ end }}
+
+<script>
+  jQuery(document).ready(function () {
+      $("#{{ $id }}").stupidtable();
+  });
+</script>
+
+<!-- https://randomgeekery.org/post/2020/06/csv-and-data-tables-in-hugo/ -->

@@ -1,12 +1,12 @@
 {{ if hugo.IsProduction }}	
-{{ with .Site.Params.analyticsid -}}	
-<!-- Global site tag (gtag.js) - Google Analytics -->
-<script id="test" async src="https://www.googletagmanager.com/gtag/js?id=G-8FWTQLRQHV"></script>
-<script>
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-{{ safeHTML (printf `gtag('config', '%s');` .) }}
-</script>	
-{{- end }}
+    {{ with .Site.Params.analyticsid -}}	
+        <!-- Global site tag (gtag.js) - Google Analytics -->
+        <script id="test" async src="https://www.googletagmanager.com/gtag/js?id=G-8FWTQLRQHV"></script>
+        <script>
+            window.dataLayer = window.dataLayer || [];
+            function gtag(){dataLayer.push(arguments);}
+            gtag('js', new Date());
+            {{ printf `gtag('config', '%s');` . | safeJS }}
+        </script>	
+    {{- end }}
 {{- end }}
