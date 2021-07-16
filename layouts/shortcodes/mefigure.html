@@ -13,6 +13,8 @@
     {{  $image = $image.Resize $dims }}
     {{ end }}
 <img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $citation}} ">
+{{ else }}
+no image
 {{ end }}
 {{ $dirFile := path.Split $filename }}
 {{ $basename := index (split $dirFile.File "." ) 0 }}

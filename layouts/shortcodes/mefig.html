@@ -1,0 +1,45 @@
+
+{{ $pagebundlepath := .Get 2  | default (.Page.Params.defaultPageBundle) }}
+    {{ $pagebundle := .Page.GetPage $pagebundlepath }}
+
+{{ $basename := .Get 0 }}
+    {{ $resourceid := .Get 0 }}
+    {{ if not (strings.HasSuffix $resourceid "md") }}
+        {{ $resourceid = printf "%s.md" $resourceid }}
+    {{ end }}
+    {{ $resource := $pagebundle.Resources.GetMatch $resourceid }}
+    {{ $fileref := $resource.Params.fileref | default (printf "images/%s.*" $basename) }}
+
+{{ $maxwidth := .Get 1 | default ($.Site.Params.ImageMaxWidth | default "800") }}
+    {{ $dims := printf "%sx" $maxwidth }}
+
+{{ $footer := .Inner }}
+{{ with $resource }}
+    {{ $citation := $resource.Params.citation }}
+    {{ $image := $pagebundle.Resources.GetMatch $fileref }}
+    {{ with $image }}
+        {{ $orighref := $image.RelPermalink }}
+<figure style="max-width: {{ $maxwidth }}px;">
+        {{ if gt $image.Width $maxwidth }}
+            {{ $image = $image.Resize $dims }}
+        {{ end }}
+<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $citation }} ">
+        {{ with $resource.Content }}
+<blockquote>{{ .  | markdownify  }}</blockquote>
+        {{ end }}
+<figcaption>
+        {{ with $citation }}
+— <cite>{{- . | markdownify -}}</cite>&nbsp;
+        {{- end -}}
+        {{- with $orighref -}}
+<a href="{{ . }}">View largest available size.</a>
+        {{- end -}}
+</figcaption>
+        {{ $footer }}
+</figure>
+    {{ else }}
+        no image at {{ $pagebundlepath }} / {{ $fileref }}
+    {{ end }}
+{{ else }}
+    no resource at {{ $pagebundlepath }} / {{ $resourceid }}
+{{ end }}

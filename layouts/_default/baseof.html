@@ -28,7 +28,7 @@
 		{{ $css = $css | minify | fingerprint | resources.PostProcess }}
 	{{ end }}
 	<link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
-	<link rel="stylesheet" media="print" href="print.css">
+	<link rel="stylesheet" media="print" href="/css/print.css">
 
 	<title>{{ .Title }}</title>
 	{{ with .Site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
