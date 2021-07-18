@@ -1,16 +1,25 @@
 {{ define "main" }}
 	<main>
+		<article>
 		{{ if or .Title .Content }}
 		<div>
 			{{ with .Title }}<h1>{{ . }}</h1>{{ end }}
+			Last Update:
+			<time datetime="{{ .Page.Lastmod.Format "Mon Jan 10 17:13:38 2020 -0700" }}" class="text-muted">
+			{{ $.Page.Lastmod.Format "Monday, Jan 2, 2006" }}
+			</time>	
 			{{ with .Content }}<div>{{ . }}</div>{{ end }}
 		</div>
 		{{ end }}
-
-		{{ range .Paginator.Pages }}
-			{{ .Render "summary" }}
+		{{ if ne .Params.hideAutoListDisplay  true }}
+			{{ range .Paginator.Pages }}
+				{{ .Render "summary" }}
+			{{ end }}
+			<nav class="nav-pages-lower"></nav>
+				{{ partial "pagination.html" . }}
+			</nav>
 		{{ end }}
-		{{ partial "pagination.html" . }}
+		</article>
 	</main>
 {{ partial "sidebar.html" . }}
 {{ end }}

@@ -1,0 +1,22 @@
+{{ $toplevel := .Get 0 }}
+{{ $toplabel := .Get 1 }}
+
+ {{ $toppage:= .Page }}
+ {{ $rpages := .Page.RegularPages }}
+ {{ if $toplevel }}
+     {{ $toppage = .Page.GetPage $toplevel }}
+     {{ $rpages = $toppage.RegularPages }}
+ {{ end }}
+
+{{ if and (not $toplabel) (ne $toppage .Page) }}
+    {{ $toplabel = $toppage.Title }}
+{{ end }}
+
+<section>
+<article>
+<h1>{{ $toplabel }}</h1>
+{{ range $rpages }}
+{{ .Render "summary" }}
+{{ end }}
+</article>
+</section>

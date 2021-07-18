@@ -1,0 +1,14 @@
+{{ $pagebundlepath := .Get 0  | default (.Page.Params.defaultPageBundle) }}
+    {{ $pagebundle := .Page.GetPage $pagebundlepath }}
+
+<ul>
+{{ range $pagebundle.Resources.Match "*.md" }}
+<li>
+    {{ if .Params.citation }}
+{{- .Params.citation -}}
+    {{ else }}
+** {{- .RelPermalink -}}
+    {{ end }}
+</li>
+{{ end }}
+</ul>

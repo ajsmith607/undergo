@@ -1,5 +1,5 @@
 
-{{ $pagebundlepath := .Get 2  | default (.Page.Params.defaultPageBundle) }}
+{{ $pagebundlepath := .Get 3  | default (.Page.Params.defaultPageBundle) }}
     {{ $pagebundle := .Page.GetPage $pagebundlepath }}
 
 {{ $basename := .Get 0 }}
@@ -10,8 +10,21 @@
     {{ $resource := $pagebundle.Resources.GetMatch $resourceid }}
     {{ $fileref := $resource.Params.fileref | default (printf "images/%s.*" $basename) }}
 
-{{ $maxwidth := .Get 1 | default ($.Site.Params.ImageMaxWidth | default "800") }}
-    {{ $dims := printf "%sx" $maxwidth }}
+{{ $width := $.Site.Params.ImageMaxWidth | default "800" }}
+{{ $height := "" }}
+{{ $size := .Get 1  }}
+{{ with $size }}
+    {{ if in . "x" }}
+        {{ $dims := split . "x"}}
+        {{ $width = index $dims 0 }}
+        {{ $height = index $dims -1 }}
+    {{ else }}
+    {{ $width = . }}
+    {{ end }}
+{{ end }}
+{{ $resize := printf "%sx%s" $width $height }}
+
+{{ $displays := .Get 2 | default "img,blockquote,figcaption,footer,aside"  }}
 
 {{ $footer := .Inner }}
 {{ with $resource }}
@@ -19,11 +32,11 @@
     {{ $image := $pagebundle.Resources.GetMatch $fileref }}
     {{ with $image }}
         {{ $orighref := $image.RelPermalink }}
-<figure style="max-width: {{ $maxwidth }}px;">
-        {{ if gt $image.Width $maxwidth }}
-            {{ $image = $image.Resize $dims }}
-        {{ end }}
-<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $citation }} ">
+<figure style="max-width: {{ $width }}px;">
+        {{ if in $displays "img" }}
+            {{ $image = $image.Resize $resize }}
+<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $image.Title }} ">
+        {{ end   }}
         {{ with $resource.Content }}
 <blockquote>{{ .  | markdownify  }}</blockquote>
         {{ end }}

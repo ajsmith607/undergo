@@ -41,13 +41,19 @@ body {
   }
 
 h1 {
-  @include v-rhythm(2);
-  font-weight: bolder;
+  @include v-rhythm(3);
 }
+
+section article h1 {
+  @include v-rhythm(1);
+}
+section article h2 {
+  @include v-rhythm(0);
+}
+section article time { display: none; }
 
 h2 {
   @include v-rhythm(1);
-  font-weight: normal;
 }
   
 a {
@@ -68,9 +74,20 @@ hr {
   color: $accent-color;
 }
 
+footer {
+  margin-top: 3em;
+}
 footer ul {
   margin-top: 0;
 } 
+
+nav {
+  min-width: 250px;
+}
+
+nav.nav-pages-lower {
+  padding-top: 2em;
+}
 
 .menu { padding: 0; }
 .menu li { display: inline-block; }
@@ -79,12 +96,9 @@ footer ul {
   border-radius: 5px;
 }
 
-nav {
-  background: $subtle-back-color;
-  margin: 16px; 
-  padding: 1em 2em;
-  width: 50%;
-  min-width: 250px;
+.home-link { 
+  font-weight: bold;
+  padding-right: 1em;
 }
 
 img, iframe, video { 
@@ -109,10 +123,15 @@ blockquote {
   hyphens: none;
 }
 
+.gallery { display: flow-root; }
+.gallery > figure {
+  float: left;
+} 
+
 figure {
   padding-left: 0;
   margin-left: 0;
-  padding-bottom: 2em;
+  padding-bottom: .5em;
 }
 
 figure img {
@@ -151,5 +170,5 @@ table cite { font-style: italic; font-weight: normal;}
   display: table;
 }
 .clearfix {
-  display: flow-root;
+  
 }

@@ -1,7 +1,15 @@
 <header>
-	<a href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a>
+	<nav id="breadcrumbs">  
+		<a class="home-link" href="{{ .Site.BaseURL }}">{{ .Site.Title }}</a> 
+		{{ if ne .Parent.Permalink .Site.BaseURL }}
+			{{ if ne .Parent.Permalink .FirstSection.Permalink}}
+	    		<a href="{{ .Parent.Permalink }}">⇡ {{ .Parent.Title }}</a>
+			{{ end }}
+	    {{ end }}
+	</nav>
+		
 	{{ with .Site.Menus.main }}
-	<nav>
+	<nav id="menu-main">
 		<ul>
 			{{ range . }}
 			<li><a href="{{ .URL | relURL }}">{{ .Name }}</a></li>
