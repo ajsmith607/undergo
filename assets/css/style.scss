@@ -112,7 +112,6 @@ img, iframe, video {
     padding-bottom: 1em;
   }
 
-main { hyphens: auto; }
 blockquote {
   max-width: 100%; 
   width: auto\9; 
@@ -138,9 +137,9 @@ figure img {
   margin-bottom: 0;
 }
 
-figcaption, figure footer {
-  padding-left: 1em;
-  font-size: 90%;
+figcaption, figure footer, figure aside {
+  padding-left: 2em;
+  font-size: 85%;
 }
 
 figure footer {

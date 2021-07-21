@@ -35,20 +35,39 @@
 <figure style="max-width: {{ $width }}px;">
         {{ if in $displays "img" }}
             {{ $image = $image.Resize $resize }}
-<img src="{{ $image.RelPermalink }}" width="{{ $image.Width }}" height="{{ $image.Height }}" alt="{{ $image.Title }} ">
+            {{ with $image }}
+<img src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ .Title }} ">
+            {{ end }}
         {{ end   }}
-        {{ with $resource.Content }}
-<blockquote>{{ .  | markdownify  }}</blockquote>
+        {{ if in $displays "blockquote"  }}
+            {{ with $resource.Content }}
+<blockquote>{{- . | markdownify  -}}</blockquote>
+            {{ end }}
         {{ end }}
+        {{ if and (in $displays "figcaption") (or $citation $orighref) }}
 <figcaption>
-        {{ with $citation }}
+            {{ with $citation }}
 — <cite>{{- . | markdownify -}}</cite>&nbsp;
-        {{- end -}}
-        {{- with $orighref -}}
+            {{- end -}}
+            {{- with $orighref -}}
 <a href="{{ . }}">View largest available size.</a>
-        {{- end -}}
+            {{- end -}}
 </figcaption>
-        {{ $footer }}
+        {{ end }}
+        {{ if in $displays "footer"  }}
+<footer>
+{{- $resource.Params.notes | default $footer | markdownify -}}
+</footer>
+        {{ end }}
+        {{ if in $displays "aside"  }}
+            {{ with $resource.Params.aside }}
+<aside>
+{{- . | markdownify -}}
+</aside>
+            {{ end }}
+        {{ end }}
+
+        
 </figure>
     {{ else }}
         no image at {{ $pagebundlepath }} / {{ $fileref }}
