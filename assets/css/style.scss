@@ -118,8 +118,9 @@ blockquote {
   margin: 0 -1em 1em 1em ;
   padding: 1em;
   background: $subtle-back-color;
-  border-left: 5px solid $active-link-color;
+  /*border-left: 5px solid $active-link-color;*/
   hyphens: none;
+  font-style: italic;
 }
 
 .gallery { display: flow-root; }
@@ -129,7 +130,7 @@ blockquote {
 
 figure {
   padding-left: 0;
-  margin-left: 0;
+  margin-left: 2em;
   padding-bottom: .5em;
 }
 
@@ -140,6 +141,7 @@ figure img {
 figcaption, figure footer, figure aside {
   padding-left: 2em;
   font-size: 85%;
+  font-style: normal;
 }
 
 figure footer {
@@ -167,7 +169,4 @@ table cite { font-style: italic; font-weight: normal;}
   content: "";
   clear: both;
   display: table;
-}
-.clearfix {
-  
 }

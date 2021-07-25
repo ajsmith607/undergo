@@ -3,12 +3,19 @@
     {{ $pagebundle := .Page.GetPage $pagebundlepath }}
 
 {{ $basename := .Get 0 }}
+    {{ $fileref := printf "images/%s.*" $basename }}
     {{ $resourceid := .Get 0 }}
     {{ if not (strings.HasSuffix $resourceid "md") }}
         {{ $resourceid = printf "%s.md" $resourceid }}
     {{ end }}
     {{ $resource := $pagebundle.Resources.GetMatch $resourceid }}
-    {{ $fileref := $resource.Params.fileref | default (printf "images/%s.*" $basename) }}
+    {{ if $resource }}
+        {{ $fileref = $resource.Params.fileref | default $fileref }}
+    {{ else }}
+        {{ if not hugo.IsProduction }}
+            no resource file at {{ $pagebundlepath }} / {{ $resourceid }}
+        {{ end }}
+    {{ end }}
 
 {{ $width := $.Site.Params.ImageMaxWidth | default "800" }}
 {{ $height := "" }}
@@ -26,52 +33,60 @@
 
 {{ $displays := .Get 2 | default "img,blockquote,figcaption,footer,aside"  }}
 
-{{ $footer := .Inner }}
-{{ with $resource }}
-    {{ $citation := $resource.Params.citation }}
-    {{ $image := $pagebundle.Resources.GetMatch $fileref }}
-    {{ with $image }}
-        {{ $orighref := $image.RelPermalink }}
 <figure style="max-width: {{ $width }}px;">
-        {{ if in $displays "img" }}
-            {{ $image = $image.Resize $resize }}
-            {{ with $image }}
+{{ $footer := .Inner }}
+
+{{ $orighref := $fileref }}
+
+{{ if in $displays "img" }}
+    {{ $image := $pagebundle.Resources.GetMatch $fileref }}
+    {{ if $image }}
+        {{ $orighref = $image.RelPermalink }}
+        {{ $image = $image.Resize $resize }}
+        {{ with $image }}
 <img src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ .Title }} ">
-            {{ end }}
-        {{ end   }}
-        {{ if in $displays "blockquote"  }}
-            {{ with $resource.Content }}
+        {{ end }}
+    {{ else }}
+        {{ if not hugo.IsProduction }}
+            no image at {{ $pagebundlepath }} / {{ $fileref }}
+        {{ end }}
+    {{ end }}
+{{ end }}
+
+{{ if and (in $displays "blockquote") $resource  }}
+    {{ with $resource.Content }}
 <blockquote>{{- . | markdownify  -}}</blockquote>
-            {{ end }}
-        {{ end }}
-        {{ if and (in $displays "figcaption") (or $citation $orighref) }}
+    {{ end }}
+{{ end }}
+
+{{ if and (in $displays "figcaption") $resource }}
 <figcaption>
-            {{ with $citation }}
+    {{ with $resource.Params.citation }}
 — <cite>{{- . | markdownify -}}</cite>&nbsp;
-            {{- end -}}
-            {{- with $orighref -}}
+    {{- end -}}
+    {{- with $orighref -}}
 <a href="{{ . }}">View largest available size.</a>
-            {{- end -}}
+    {{- end -}}
 </figcaption>
-        {{ end }}
-        {{ if in $displays "footer"  }}
+{{ end }}
+
+{{ if and (in $displays "footer") $resource  }}
 <footer>
 {{- $resource.Params.notes | default $footer | markdownify -}}
 </footer>
-        {{ end }}
-        {{ if in $displays "aside"  }}
-            {{ with $resource.Params.aside }}
+{{ end }}
+{{ if and (in $displays "aside") $resource  }}
+    {{ with $resource.Params.aside }}
 <aside>
 {{- . | markdownify -}}
 </aside>
-            {{ end }}
-        {{ end }}
-
-        
-</figure>
-    {{ else }}
-        no image at {{ $pagebundlepath }} / {{ $fileref }}
     {{ end }}
-{{ else }}
-    no resource at {{ $pagebundlepath }} / {{ $resourceid }}
 {{ end }}
+ 
+</figure>
+
+
+
+
+
+
