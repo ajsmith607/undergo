@@ -120,7 +120,6 @@ blockquote {
   background: $subtle-back-color;
   /*border-left: 5px solid $active-link-color;*/
   hyphens: none;
-  font-style: italic;
 }
 
 .gallery { display: flow-root; }
@@ -140,8 +139,7 @@ figure img {
 
 figcaption, figure footer, figure aside {
   padding-left: 2em;
-  font-size: 85%;
-  font-style: normal;
+  font-size: 90%;
 }
 
 figure footer {

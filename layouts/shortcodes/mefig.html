@@ -24,9 +24,9 @@
     {{ if in . "x" }}
         {{ $dims := split . "x"}}
         {{ $width = index $dims 0 }}
-        {{ $height = index $dims -1 }}
+        {{ $height = index $dims (sub (len $dims) 1)  }}
     {{ else }}
-    {{ $width = . }}
+        {{ $width = . }}
     {{ end }}
 {{ end }}
 {{ $resize := printf "%sx%s" $width $height }}
@@ -34,8 +34,6 @@
 {{ $displays := .Get 2 | default "img,blockquote,figcaption,footer,aside"  }}
 
 <figure style="max-width: {{ $width }}px;">
-{{ $footer := .Inner }}
-
 {{ $orighref := $fileref }}
 
 {{ if in $displays "img" }}
@@ -44,7 +42,11 @@
         {{ $orighref = $image.RelPermalink }}
         {{ $image = $image.Resize $resize }}
         {{ with $image }}
-<img src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ .Title }} ">
+            {{ $alt := .Title }}
+            {{ if $resource }}
+                {{- $alt = $resource.Params.alt | markdownify -}}
+            {{ end }}
+<img src="{{ .RelPermalink }}" width="{{ .Width }}" height="{{ .Height }}" alt="{{ $alt }} ">
         {{ end }}
     {{ else }}
         {{ if not hugo.IsProduction }}
@@ -54,7 +56,11 @@
 {{ end }}
 
 {{ if and (in $displays "blockquote") $resource  }}
-    {{ with $resource.Content }}
+    {{ $quote := $resource.Content }}
+    {{ if .Inner }}
+        {{ $quote = .Inner }}
+    {{ end }}
+    {{ with $quote }}
 <blockquote>{{- . | markdownify  -}}</blockquote>
     {{ end }}
 {{ end }}
@@ -72,7 +78,7 @@
 
 {{ if and (in $displays "footer") $resource  }}
 <footer>
-{{- $resource.Params.notes | default $footer | markdownify -}}
+{{- $resource.Params.notes | markdownify -}}
 </footer>
 {{ end }}
 {{ if and (in $displays "aside") $resource  }}
