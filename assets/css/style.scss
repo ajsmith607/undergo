@@ -50,7 +50,7 @@ section article h1 {
 section article h2 {
   @include v-rhythm(0);
 }
-section article time { display: none; }
+section article time, article.summary time  { display: none; }
 
 h2 {
   @include v-rhythm(1);
@@ -95,6 +95,8 @@ nav.nav-pages-lower {
   padding: 5px;
   border-radius: 5px;
 }
+
+
 
 .home-link { 
   font-weight: bold;

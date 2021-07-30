@@ -3,8 +3,9 @@
     {{ $pagebundle := .Page.GetPage $pagebundlepath }}
 
 {{ $basename := .Get 0 }}
-    {{ $fileref := printf "images/%s.*" $basename }}
+    {{ $fileref := printf "data_files/%s.*" $basename }}
     {{ $resourceid := .Get 0 }}
+    {{ $resourceid = printf "metadata_files/%s" $resourceid }}
     {{ if not (strings.HasSuffix $resourceid "md") }}
         {{ $resourceid = printf "%s.md" $resourceid }}
     {{ end }}

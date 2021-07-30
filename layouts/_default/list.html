@@ -6,7 +6,7 @@
 			{{ with .Title }}<h1>{{ . }}</h1>{{ end }}
 			Last Update:
 			<time datetime="{{ .Page.Lastmod.Format "Mon Jan 10 17:13:38 2020 -0700" }}" class="text-muted">
-			{{ $.Page.Lastmod.Format "Monday, Jan 2, 2006" }}
+			{{ $.Page.Lastmod.Format (.Site.Params.humanDateFormat | default "Monday Jan 2, 2006") }}
 			</time>	
 			{{ with .Content }}<div>{{ . }}</div>{{ end }}
 		</div>
