@@ -32,7 +32,7 @@
 {{ end }}
 {{ $resize := printf "%sx%s" $width $height }}
 
-{{ $displays := .Get 2 | default "img,blockquote,figcaption,footer,aside"  }}
+{{ $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside"  }}
 
 <figure style="max-width: {{ $width }}px;">
 {{ $orighref := $fileref }}
@@ -66,15 +66,21 @@
     {{ end }}
 {{ end }}
 
-{{ if and (in $displays "figcaption") $resource }}
-<figcaption>
-    {{ with $resource.Params.citation }}
-— <cite>{{- . | markdownify -}}</cite>&nbsp;
+{{ if  $resource }}
+    {{- if or (in $displays "cite") (in $displays "link") -}}
+        <figcaption>
+            {{- if in $displays "cite" -}}
+                {{- with $resource.Params.citation -}}
+                    — <cite>{{- . | markdownify -}}</cite>&nbsp;
+                {{- end -}}
+            {{ end }}
+            {{- if in $displays "link" -}}
+                {{- with $orighref -}}
+                    <a href="{{ . }}">View largest available size.</a>
+                {{- end -}}
+            {{- end -}}
+        </figcaption>
     {{- end -}}
-    {{- with $orighref -}}
-<a href="{{ . }}">View largest available size.</a>
-    {{- end -}}
-</figcaption>
 {{ end }}
 
 {{ if and (in $displays "footer") $resource  }}
