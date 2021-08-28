@@ -1,5 +1,4 @@
-
-{{ $pagebundlepath := .Get 3  | default (.Page.Params.defaultPageBundle) }}
+{{ $pagebundlepath := .Get 4  | default (.Page.Params.defaultPageBundle) }}
     {{ $pagebundle := .Page.GetPage $pagebundlepath }}
 
 {{ $basename := .Get 0 }}
@@ -30,9 +29,10 @@
         {{ $width = . }}
     {{ end }}
 {{ end }}
-{{ $resize := printf "%sx%s" $width $height }}
 
 {{ $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside"  }}
+
+{{ $anchor := .Get 3 | default ("none") }}
 
 <figure style="max-width: {{ $width }}px;">
 {{ $orighref := $fileref }}
@@ -41,7 +41,13 @@
     {{ $image := $pagebundle.Resources.GetMatch $fileref }}
     {{ if $image }}
         {{ $orighref = $image.RelPermalink }}
-        {{ $image = $image.Resize $resize }}
+        {{ if eq $anchor "none" }}
+          {{ $resize := printf "%sx%s" $width $height }}
+          {{ $image = $image.Resize $resize }}
+        {{ else }}
+          {{ $resize := printf "%sx%s %s" $width $height $anchor }}
+          {{ $image = $image.Fill $resize }}
+        {{ end }}
         {{ with $image }}
             {{ $alt := .Title }}
             {{ if $resource }}
