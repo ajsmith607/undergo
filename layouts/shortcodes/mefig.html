@@ -72,21 +72,21 @@
     {{ end }}
 {{ end }}
 
-{{ if  $resource }}
-    {{- if or (in $displays "cite") (in $displays "link") -}}
-        <figcaption>
-            {{- if in $displays "cite" -}}
-                {{- with $resource.Params.citation -}}
-                    — <cite>{{- . | markdownify -}}</cite>&nbsp;
-                {{- end -}}
-            {{ end }}
-            {{- if in $displays "link" -}}
-                {{- with $orighref -}}
-                    <a href="{{ . }}">View largest available size.</a>
-                {{- end -}}
-            {{- end -}}
-        </figcaption>
-    {{- end -}}
+{{- if or (in $displays "cite") (in $displays "link") -}}
+  <figcaption>
+  {{ if  $resource }}
+     {{- if in $displays "cite" -}}
+         {{- with $resource.Params.citation -}}
+             — <cite>{{- . | markdownify -}}</cite>&nbsp;
+         {{- end -}}
+     {{ end }}
+  {{ end }}
+  {{- if in $displays "link" -}}
+      {{- with $orighref -}}
+          <a href="{{ . }}">View largest available size.</a>
+      {{- end -}}
+  {{- end -}}
+  </figcaption>
 {{ end }}
 
 {{ if and (in $displays "footer") $resource  }}
