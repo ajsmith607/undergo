@@ -14,9 +14,9 @@
 
   <script src="/js/stupidtable.min.js"></script>
   <script src="/js/smartquotes.js"></script>
-
 	{{ $configCSS := resources.Get "css/config.scss" }}
 	{{ $baseCSS := resources.Get "css/base.scss" }}
+    {{ $customCSS := "" }}
     {{ if (fileExists "css/custom.scss") }}
         {{ $customCSS := resources.Get "css/custom.scss" }}
     {{ end }}
@@ -40,6 +40,7 @@
 	{{- end }}
 </head>
 <body>
+    something?
 	{{ partial "header" . }}
 	{{ block "main" . }}{{ end }}
 	{{ partial "footer" . }}
