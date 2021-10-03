@@ -1,5 +1,5 @@
 
-/**
+/** changed?
  * Vertical rhythm by Syncope
  * http://nowodzinski.pl/syncope
  */
@@ -114,10 +114,6 @@ img, iframe, video {
     padding-bottom: 1em;
 }
 
-.img-only {
-  max-width: 90%;
-}
-
 blockquote {
   max-width: 100%; 
   width: auto\9; 
@@ -141,7 +137,6 @@ blockquote {
   float: left;
 }
 */
-/* First the Grid */
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -162,6 +157,10 @@ figure {
 
 figure img {
   margin-bottom: 0;
+}
+
+figure.hero, figure.hero img {
+    margin-left: 0 !important;
 }
 
 figcaption, figure footer, figure aside {

@@ -13,12 +13,15 @@
   crossorigin="anonymous"></script>
 
   <script src="/js/stupidtable.min.js"></script>
+  <script src="/js/smartquotes.js"></script>
 
 	{{ $configCSS := resources.Get "css/config.scss" }}
-	{{ $baseCSS := resources.Get "css/style.scss" }}
-	{{ $customCSS := resources.Get "css/custom.scss" }}
-	{{ $css := slice $configCSS $baseCSS $customCSS | resources.Concat "css/style.scss" }}
-	{{ $css = $css | resources.ExecuteAsTemplate "css/style.scss" . |  toCSS }}
+	{{ $baseCSS := resources.Get "css/base.scss" }}
+    {{ if (fileExists "css/custom.scss") }}
+        {{ $customCSS := resources.Get "css/custom.scss" }}
+    {{ end }}
+    {{ $css := slice $configCSS $baseCSS $customCSS }} 
+	{{ $css = $css | resources.ExecuteAsTemplate (print now.Unix $template) . |  toCSS }}
 
 	{{ range .AlternativeOutputFormats -}}
     {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}

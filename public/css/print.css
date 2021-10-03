@@ -106,21 +106,6 @@
     {
         display: none;
     }
-        
-    /* Benutzerdefinierte Nachrichten vor und nach dem Inhalt einfügen */
-    .entry:after {
-        content: "\ Alle Rechte vorbehalten. (c) 2014 - 2016 TechBrain - techbrain.de";
-        color: #999 !important;
-        font-size: 1em;
-        padding-top: 30px;
-    }
-    #header:before {
-        content: "\ Vielen herzlichen Dank für das Ausdrucken unseres Artikels. Wir hoffen, dass auch andere Artikel von uns Ihr Interesse wecken können.";
-        color: #777 !important;
-        font-size: 1em;
-        padding-top: 30px;
-        text-align: center !important;    
-    }
     
     /* Wichtige Elemente definieren */    
     p, address, li, dt, dd, blockquote {
