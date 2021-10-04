@@ -1,5 +1,5 @@
 
-/** changed?
+/** 
  * Vertical rhythm by Syncope
  * http://nowodzinski.pl/syncope
  */
@@ -28,7 +28,7 @@
 }
 
 html, body {
-	font: 16px/1.6 $font-family;
+  font: 16px/1.6 $font-family;
   @include v-rhythm(0)
 }
 
