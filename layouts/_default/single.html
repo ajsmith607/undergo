@@ -1,12 +1,12 @@
 {{ define "main" }}
-	<main>
+	<main class="single">
 		<article>
 			<h1>{{ .Title }}</h1>
-			Last Update:
-			<time datetime="{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}" class="text-muted">
-				{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}
-			</time>	
-
+            <div class="meta">Last Update:
+                <time datetime="{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}" class="text-muted">
+                    {{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}
+                </time>	
+            </div>
 			{{ with .TableOfContents }}
 			<!-- the variable is set -->
 			{{ if ne . "<nav id=\"TableOfContents\"></nav>" }}
