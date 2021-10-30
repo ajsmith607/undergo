@@ -1,5 +1,6 @@
 {{ define "main" }}
-	<main class="list">
+
+    {{ printf `<main id="%s"  class="single">` (.Param "mainid") | safeHTML }}
 		<article>
 		{{ if or .Title .Content }}
 		<div>

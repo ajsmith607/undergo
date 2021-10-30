@@ -1,5 +1,6 @@
 {{ define "main" }}
-	<main class="single">
+
+    {{ printf `<main id="%s"  class="single">` (.Param "mainid") | safeHTML }}
 		<article>
 			<h1>{{ .Title }}</h1>
             <div class="meta">Last Update:

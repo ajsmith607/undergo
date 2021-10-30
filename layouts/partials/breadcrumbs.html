@@ -1,3 +1,9 @@
-<nav id="nav-breadcrumbs">
-<a href="{{ .Parent.Permalink }}">⇡ {{ .Parent.Title }}</a>
+<nav id="breadcrumbs">  
+    {{ partial "homelink.html" .  }} 
+    {{ if ne .Parent.Permalink .Site.BaseURL }}
+        {{ if ne .Parent.Permalink .FirstSection.Permalink}}
+            <a href="{{ .Parent.Permalink }}">⇡ {{ .Parent.Title }}</a>
+        {{ end }}
+    {{ end }}
 </nav>
+

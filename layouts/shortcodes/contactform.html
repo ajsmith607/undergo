@@ -1,0 +1,10 @@
+
+<form action="{{ .Site.Params.contactformEndpoint }}" method="POST" id="form-contact">
+  <input type="email" name="email" placeholder="enter your email" required />
+  <input type="text" name="name" placeholder="enter your name" required />
+  {{ .Site.Params.contactformAntispam | safeHTML }}
+  <textarea name="message" cols="30" rows="10"></textarea>
+  <button>Submit</button>
+</form>
+
+

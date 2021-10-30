@@ -1,4 +1,4 @@
-
+* {box-sizing: border-box;}
 /** 
  * Vertical rhythm by Syncope
  * http://nowodzinski.pl/syncope
@@ -35,7 +35,6 @@ html, body {
 body {
     max-width: 800px;
     margin: auto;
-    padding: 1em;
     background-color: $background-color;
     color: $color;
   }
@@ -79,12 +78,32 @@ hr {
 footer {
   margin-top: 3em;
 }
+
 footer ul {
   margin-top: 0;
 } 
 
 nav {
   min-width: 250px;
+}
+
+.homelink { 
+  font-weight: bold;
+  padding-right: 2em;
+}
+
+header nav ul {
+    padding-left: 0;
+    margin-left: 0;
+}
+
+header nav ul {
+    display: flex;
+}
+
+header nav ul li {
+    list-style-type: none;
+    padding-right: 2em
 }
 
 nav.nav-pages-lower {
@@ -98,12 +117,7 @@ nav.nav-pages-lower {
   border-radius: 5px;
 }
 
-.home-link { 
-  font-weight: bold;
-  padding-right: 1em;
-}
-
-img, iframe, video { 
+figure, img, iframe, video { 
     max-width: 100%; 
     width: auto\9; 
     height: auto; 
@@ -147,8 +161,6 @@ blockquote {
 } 
 
 figure {
-  width: 100%;
-  height: auto;
   padding-left: 0;
   margin-left: 2em;
   padding-bottom: .5em;
@@ -194,4 +206,10 @@ table cite { font-style: italic; font-weight: normal;}
   content: "";
   clear: both;
   display: table;
+}
+
+input, textarea, button {
+    border: 0;
+    font-family: inherit;
+    font-size: inherit;
 }
