@@ -37,7 +37,9 @@ body {
     max-width: 800px;
     background-color: $background-color;
     color: $color;
-  }
+    margin-left: auto;
+    margin-right: auto;
+}
 
 h1 {
   @include v-rhythm(3);
