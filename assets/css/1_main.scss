@@ -121,7 +121,7 @@ nav.nav-pages-lower {
   border-radius: 5px;
 }
 
-figure, img, iframe, video { 
+img, iframe, video { 
     max-width: 100%; 
     width: auto\9; 
     height: auto; 
@@ -129,7 +129,6 @@ figure, img, iframe, video {
     border: 0; 
     -ms-interpolation-mode: bicubic;
     margin: 1em; 
-    padding-bottom: 1em;
 }
 
 blockquote {
@@ -143,9 +142,9 @@ blockquote {
 }
 
 .quote-only {
-  max-width: 630px;
+  max-width: 500px;
   margin-top: 2em;
-  margin-left: 3em;
+  margin-left: 2em;
   margin-bottom: 2em;
 }
 
@@ -155,24 +154,16 @@ blockquote {
   float: left;
 }
 */
+
 .gallery {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  grid-gap: 1.3rem;
-  /*justify-items: center;*/
   margin: 0;
   padding: 0;
 } 
 
 figure {
-  padding-left: 0;
-  margin-left: 2em;
   padding-bottom: .5em;
-  margin-bottom: 2em;
-}
-
-figure img {
-  margin-bottom: 0;
 }
 
 figure.hero, figure.hero img {
@@ -181,7 +172,7 @@ figure.hero, figure.hero img {
 
 figcaption, figure footer, figure aside {
   padding-left: 2em;
-  font-size: 80%;
+  font-size: 90%;
   line-height: 1.5em;
 }
 
