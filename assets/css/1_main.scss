@@ -166,22 +166,23 @@ figure {
   padding-bottom: .5em;
 }
 
-figure.hero, figure.hero img {
-    margin-left: 0 !important;
-}
-
 figcaption, figure footer, figure aside {
   padding-left: 2em;
   font-size: 90%;
   line-height: 1.5em;
 }
 
+figcaption {
+  margin-top: 0;
+}
+
 figure footer {
   margin-top: 1.5em;
 }
 
-figcaption {
-  margin-top: 0;
+figure.hero, figure.hero img, figure.hero figcaption {
+    margin-left: 0 !important;
+    padding-left: 0 !important; 
 }
 
 table {
