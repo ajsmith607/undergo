@@ -183,13 +183,14 @@ figure footer {
 figure.hero, figure.hero img, figure.hero figcaption {
     margin-left: 0 !important;
     padding-left: 0 !important; 
-    @include v-rhythm(1);
 }
 
 figure.hero blockquote {
   width: 70%;
+  margin-top: 2em;
   margin-left: auto;
   margin-right: auto;
+  padding-top: 1.63rem;
   font-style: italic; 
 }
 
