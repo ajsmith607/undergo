@@ -1,6 +1,5 @@
 {{ define "main" }}
-
-    {{ printf `<main id="%s"  class="single">` (.Param "mainid") | safeHTML }}
+    <main id="{{ with .Params.mainid }}{{ . }}{{ end }}"  class="list"> 
 		<article>
 		{{ if or .Title .Content }}
 		<div>
@@ -8,14 +7,15 @@
 			{{ with .Content }}<div>{{ . }}</div>{{ end }}
 		</div>
 		{{ end }}
-		{{ if ne .Params.hideAutoListDisplay  true }}
-			{{ range .Paginator.Pages }}
-				{{ .Render "summary" }}
-			{{ end }}
-			<nav class="nav-pages-lower"></nav>
-				{{ partial "pagination.html" . }}
-			</nav>
-		{{ end }}
+
+        {{ if ne (default false (.Param "hideAutoListDisplay")) true }}
+            {{ range .Paginator.Pages }}
+                {{ .Render "summary" }}
+            {{ end }}
+            <nav class="nav-pages-lower"></nav>
+                {{ partial "pagination.html" . }}
+            </nav>
+        {{ end }}
 		</article>
 	</main>
 {{ partial "sidebar.html" . }}
