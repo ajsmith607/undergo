@@ -1,48 +1,16 @@
 <!DOCTYPE html>
 <html lang="{{ .Site.LanguageCode | default "en-us" }}">
-<head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name=”robots” content="index, follow">
-	{{ with .Site.Params.additionalmetatags -}}{{ safeHTML . }}{{- end }}
-
-	{{ range .AlternativeOutputFormats -}}
-    {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
-{{ end -}}
-
-    {{ $css := (sort (resources.Match "/css/**.scss") "Name") | resources.Concat "css/style.scss" | resources.ExecuteAsTemplate "css/main.scss" . | toCSS }}
-	{{ if hugo.IsProduction }}
-		{{ $css = $css | minify | fingerprint | resources.PostProcess }}
-	{{ end }}
-	<link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
-	<link rel="stylesheet" media="print" href="/css/print.css">
-
-    <script src="https://code.jquery.com/jquery-3.6.0.slim.min.js" crossorigin="anonymous"
-            integrity="sha256-u7e5khyithlIdTpu22PHhENmPcRdFiHRjhAuHcs05RI="></script>
-    <script src="/js/stupidtable.min.js"></script>
-    <script src="/js/smartquotes.js"></script>
-
-    {{ with resources.Match "/js/**.js" }}
-        {{ $js := . |resources.Concat "js/bundle.js" }}
-        {{ if hugo.IsProduction }}
-            {{ $js = $js | minify | fingerprint }}
-        {{ end }}
-        <script src="{{ $js.RelPermalink }}" integrity="{{ $js.Data.Integrity }}"></script> 
-   {{ end }}	
-
-    <title>{{ .Title }}</title>
-	{{ with .Site.Params.description }}<meta name="description" content="{{ . }}">{{ end }}
-	{{ with .OutputFormats.Get "RSS" -}}
-		{{ printf `<link rel="%s" type="%s" href="%s" title="%s">` .Rel .MediaType.Type .RelPermalink $.Site.Title | safeHTML }}
-	{{- end }}
-</head>
-<body>
-	{{ partial "header" . }}
-	{{ block "main" . }}{{ end }}
-	{{ partial "footer" . }}
-
-	{{ partial "analytics" . }}
-	
-</body>
+    <head>
+        {{ partial "head-meta" . }}
+        {{ partial "head-links" . }}
+        {{ partial "head-css" . }}
+        {{ partial "head-staticjs" . }}
+        {{ partial "head-assetjs" . }}
+    </head>
+    <body>
+        {{ partial "header" . }}
+        {{ block "main" . }}{{ end }}
+        {{ partial "footer" . }}
+        {{ partial "analytics" . }}
+    </body>
 </html> 
