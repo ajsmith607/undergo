@@ -1,0 +1,5 @@
+{{ with .Scratch.Get "svgpath" }}
+    {{ with resources.GetMatch . }}
+        {{  .Content | safeHTML }}
+    {{ end }}
+{{ end }}

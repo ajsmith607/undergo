@@ -3,11 +3,11 @@
  * Vertical rhythm by Syncope
  * http://nowodzinski.pl/syncope
  */
-
- $v-rhythm-levels: (
-	3: ( 2.63rem, 3.26rem, 0.235rem, 0.147rem ),
-	2: ( 2.63rem, 3.26rem, 0.286rem, 0.333rem ),
-	1: ( 1.63rem, 2.00rem, 0.654rem, 0.346rem ),
+ 
+$v-rhythm-levels: (
+	3: ( 2.63rem, 3.26rem, 0.618, 0.147rem ),
+	2: ( 2.63rem, 3.26rem, 0.905, 0.333rem ),
+	1: ( 1.63rem, 2.00rem, 1.65rem, 0.346rem ),
 	0: ( 1.00rem, 1.63rem, 0.500rem, 1.13rem ),
 );
 
@@ -39,6 +39,10 @@ body {
     color: $color;
 }
 
+header, main, footer {
+  margin: 0 1rem;
+}
+
 h1 {
   @include v-rhythm(3);
 }
@@ -46,9 +50,11 @@ h1 {
 section article h1 {
   @include v-rhythm(1);
 }
+
 section article h2 {
   @include v-rhythm(0);
 }
+
 section article time, article.summary time  { display: none; }
 
 h2 {
@@ -213,4 +219,10 @@ input, textarea, button {
     border: 0;
     font-family: inherit;
     font-size: inherit;
+}
+
+
+html, body {
+  font: 16px/1.6 $font-family;
+  @include v-rhythm(0)
 }

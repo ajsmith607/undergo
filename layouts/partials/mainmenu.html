@@ -3,7 +3,7 @@
 {{ with .Site.Menus.main }}
 <nav id="menumain">
     <ul>
-        {{ partial "homelink.html" $pageContext -}} 
+        <li>{{ partial "homelink.html" $pageContext -}}</li> 
         {{ range . }}
         <li><a href="{{ .URL | relURL }}">{{ .Name }}</a></li>
         {{ end }}
