@@ -203,7 +203,7 @@ table {
   margin-top: 2em;
   margin-bottom: 3em;
 }
-thead th { border-bottom: 1px solid $active-link-color }
+table thead th { border-bottom: 1px solid $active-link-color }
 th, td { padding: 5px; text-align: left;}
 thead, tfoot, tr:nth-child(even) { background: $subtle-back-color; }
 table caption { font-style: normal; font-weight: bold; }

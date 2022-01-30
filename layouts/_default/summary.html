@@ -3,10 +3,12 @@
     <div class="meta">
         <time>{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}</time>
     </div>
-	{{ range .Params.tags }}
-	<a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
-	{{ end }}
-<div>
-{{ .Summary }}
-</div>
+    <div class="meta">
+        {{ range .Params.tags }}
+            <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
+        {{ end }}
+    </div>
+    <div class="content">
+        {{ .Summary }}
+    </div>
 </article>

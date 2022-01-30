@@ -1,0 +1,5 @@
+{{ with .Get 0 }}
+    {{ with resources.GetMatch . }}
+        {{  .Content | safeHTML }}
+    {{ end }}
+{{ end }}

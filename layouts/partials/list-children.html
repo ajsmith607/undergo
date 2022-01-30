@@ -1,0 +1,6 @@
+{{ with .Scratch.Get "parent" }}
+    {{ $rpages := .Page.Pages }}
+    {{ range $rpages }}
+        {{ .Render "summary" }}
+    {{ end }}
+{{ end }}
