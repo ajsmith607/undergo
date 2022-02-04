@@ -1,4 +1,5 @@
 
+
 {{ $filename := .Get 0  }}
 {{ $id := .Get 1  }}
 {{ $cols := .Get 2 }}
@@ -21,33 +22,47 @@
   {{ $data = $data | append $mappedrow }}
 {{ end }}
 
-{{ with (and $wherekey $whereop ) }}
+{{ with (and $wherekey $whereop $wherematch ) }}
     {{ $data = where $data $wherekey $whereop $wherematch }}
 {{ end }}
 
 {{ with $data }}
-<table id="{{ $id }}"> 
+<figure class="table" id="{{ $id }}"> 
+    <table>
+
+<thead>
 <tr> 
     {{ $includecols := split $cols "," }}
     {{ range $includecols }} 
-<th>
-        {{ . | humanize }}</th> 
+<th>{{ . | humanize }}</th> 
     {{ end }} 
 </tr>
+</thead>
+
+<tbody>
     {{ range $row := . }}
 <tr>
         {{ range $includecols }} 
-<td>
-            {{ index $row . }}</td>
-        {{ end }}</tr>
+<td>{{ index $row . }}</td>
+        {{ end }}
+</tr>
     {{ end }}
-  {{ with $citation }}<caption>— <cite>{{ . | markdownify }}</caption>{{ end }}
+</tbody>
+
 </table>
+<figcaption>
+{{ with $citation }}
+<tfoot>
+  — <cite>{{ . | markdownify }}</cite>
+</tfoot>
+{{ end }}
+</figcaption>
+</figure>
 {{ end }}
 
 <script>
   jQuery(document).ready(function () {
-      $("#{{ $id }}").stupidtable();
+      //$("#{{ $id }}").stupidtable();
   });
 </script>
 

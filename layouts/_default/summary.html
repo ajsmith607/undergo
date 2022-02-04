@@ -1,14 +1,17 @@
 <article class="summary"> 
-	<h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
-    <div class="meta">
-        <time>{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}</time>
-    </div>
-    <div class="meta">
-        {{ range .Params.tags }}
-            <a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
-        {{ end }}
-    </div>
-    <div class="content">
-        {{ .Summary }}
-    </div>
+	
+<h2><a href="{{ .Permalink }}">{{ .Title }}</a></h2>
+
+<div class="meta">
+    <time>{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}</time>
+</div>
+
+{{ range .Params.tags }}
+<a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
+{{ end }}
+
+<div class="content">
+{{ .Summary }}
+</div>
+
 </article>

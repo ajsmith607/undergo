@@ -34,7 +34,7 @@
 
 {{ $anchor := .Get 3 | default ("none") }}
 
-<figure style="max-width: {{ $width }}px;">
+<figure class="image" style="max-width: {{ $width }}px;">
 {{ $orighref := $fileref }}
 
 {{ if in $displays "img" }}
@@ -90,14 +90,17 @@
 {{ end }}
 
 {{ if and (in $displays "footer") $resource  }}
+    {{ with $resource.Params.notes }}
 <footer>
-{{- $resource.Params.notes | markdownify -}}
+        {{- . | markdownify -}}
 </footer>
+    {{ end }}
 {{ end }}
+
 {{ if and (in $displays "aside") $resource  }}
     {{ with $resource.Params.aside }}
 <aside>
-{{- . | markdownify -}}
+        {{- . | markdownify -}}
 </aside>
     {{ end }}
 {{ end }}
