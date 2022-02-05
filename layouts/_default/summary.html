@@ -8,9 +8,7 @@
 
 <div class="content">
 {{- .Summary -}}
-{{- if .Truncated -}}
 <a href="{{ .Permalink }}" class="more-link">read more</a>
-{{- end -}}
 </div>
 
 {{ partial "tags.html" . }}
