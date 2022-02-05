@@ -36,7 +36,7 @@ html, body {
     color: var(--color);
     font-family: var(--font-family);
     font-size: var(--font-size);
-    line-height: var(--line-height); 
+    line-height: var(--line-height-unitless); 
 }
 
 header, main, aside, footer {
