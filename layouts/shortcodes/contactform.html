@@ -1,9 +1,9 @@
 
 <form action="{{ with .Site.Params.contactformEndpoint }}{{.}} {{ end }}" method="POST" id="form-contact">
-  <input type="email" name="email" placeholder="enter your email" required />
-  <input type="text" name="name" placeholder="enter your name" required />
+  <input type="email" name="email" placeholder="email" required />
+  <input type="text" name="name" placeholder="name" required />
   {{ with .Site.Params.contactformAntispam}}{{ . | safeHTML }}{{ end }}
-  <textarea name="message" cols="30" rows="10"></textarea>
+  <textarea name="message" cols="30" rows="10" placeholder="message"></textarea>
   <button>Submit</button>
 </form>
 

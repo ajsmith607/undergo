@@ -6,12 +6,13 @@
     <time>{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}</time>
 </div>
 
-{{ range .Params.tags }}
-<a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a>
-{{ end }}
-
 <div class="content">
-{{ .Summary }}
+{{- .Summary -}}
+{{- if .Truncated -}}
+<a href="{{ .Permalink }}" class="more-link">read more</a>
+{{- end -}}
 </div>
+
+{{ partial "tags.html" . }}
 
 </article>

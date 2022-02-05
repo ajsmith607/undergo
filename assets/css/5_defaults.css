@@ -1,23 +1,33 @@
+
+/* 
+ * variables can't be used in media queries
+ * so they are hard coded in the css,
+ * but kept in root to show the intended relationships
+ */
+
 :root {
-    --font-family: Lucida Sans, Helvetica, Arial, sans-serif; 
-    --font-family: Optima, Candara, Calibri, Arial, sans-serif;
-    --font-size: 18px;
-    --mobile-font-size: 16px; 
+    --font-family: Tahoma, Verdana, Segoe, sans-serif;
+    --font-size: 20px;
+    --mobile-font-size: calc( var(--font-size) * 0.75 ); 
     --line-height-unitless: 1.5;
     --line-height: calc( var(--line-height-unitless) * 1rem);
-    --max-width: 42rem;  
+    --line-length: 40;
+    --left-margin: 16%;
+    --max-width: calc( var(--line-length) * 1rem );  
+    --breakpoint: calc( var(--font-size) * var(--line-length) );
+    --breakpoint2: calc( var(--breakpoint) * 1.25 );
     --background-color: #4D3636;
     --background-color2: #664747;
     --color: white;
     --active-link-color: white;
-    --visited-link-color: 808080;
-    --border-color: 
+    --visited-link-color: #808080;
+    --border-color:  white; 
 }
 
 *, *:before, *:after {
     margin: 0;
     padding: 0;
-    margin-bottom:  var(--line-height);
+    margin-bottom: var(--line-height);
     box-sizing: border-box;
 }
 
@@ -29,42 +39,24 @@ html, body {
     line-height: var(--line-height); 
 }
 
-@media only screen and (max-width: var(--max-width, 800px)) {
-    html,body { font-size: var(--mobile-font-size); }
-}
-
-h1 a, h2 a, h3 a, 
-h1 a:visited, h2 a:visited, h3 a:visited {
-   color: var(--color);
-}
-
-h1 { font-size: 3rem; }
-h2, article h1 { font-size: 2rem; padding-top: var(--line-height); }
-h1, h2, article h1 { line-height: calc( var(--line-height) * 2); }
-h3, article h2 { font-size: calc( var(--line-height); }
-h2, h3 { padding-top: calc( var(--line-height); }
-h4, article h3, caption { 
-    font-size: 1rem; 
-    font-weight: bold; 
-}
-
 header, main, aside, footer {
-    margin: 0 auto;
+    margin: 0 auto 0 var(--left-margin);
     padding: 0 calc( var(--line-height) / 2);
     max-width: var(--max-width);
 }
 
 header, footer {
-    padding-top: var(--line-height);
-    padding-bottom: var(--line-height);
+    padding-top: calc( var(--line-height) * 1);
 }
 
-blockquote ul, footer ul { padding-left: var(--line-height); }
+/* this accounts for 16% offset above */
+@media only screen and (max-width: 1000px) {
+    header, main, aside, footer { margin-left: auto; }
+}
 
-hr {
-    width: 62%;
-    margin-left: 0px;
-    color: var(--border-color);
+/* if this is overridden, styles will have to be duplicated to remain in effect */ 
+@media only screen and (max-width: 800px) {
+    html,body { font-size: var(--mobile-font-size); }
 }
 
 nav {
@@ -72,20 +64,22 @@ nav {
     white-space: nowrap;
 }
 
+nav ul {
+    display: flex;
+}
+
+nav ul, nav ul li {  
+    padding: 0;
+    margin: 0;
+}
+
 .homelink, nav ul li { 
     display: inline-block;
+    list-style-type: none;
     margin-right: var(--line-height);
 }
 
 .homelink { font-weight: bold; }
-
-nav ul {
-    padding-left: 0;
-    margin-left: 0;
-    display: flex;
-}
-
-nav ul li { list-style-type: none; }
 
 a, 
 nav a, 
@@ -93,7 +87,7 @@ h1 a, h2 a, h3 a, h4 a, {
     color: var(--active-link-color);
 }
 
-nav a, 
+nav a, .copyright a, 
 h1 a, h2 a, h3 a, h4 a, {
     text-decoration: none;
 }
@@ -102,13 +96,37 @@ a:hover, nav a:hover {
     text-decoration: underline;
 }
 
-a:visited, nav a:visited {
+a:visited, nav a:visited .copyright a:visited {
     color: var(--active-link-color);
     text-decoration: none;
 }
 
+h1 { font-size: 3rem; }
+h2, article h1 { 
+    font-size: 2rem; 
+    padding-top: var(--line-height);
+    margin-bottom: calc( var(--line-height) /2); 
+}
+h1, h2, article h1 { 
+    line-height: calc( var(--line-height) * 2); 
+    font-weight: normal; 
+}
+h3, article h2 { font-size: 1.5rem; }
+h2, h3 { padding-top: calc( var(--line-height); }
+h4, article h3, caption { 
+    font-size: 1rem; 
+    font-weight: bold; 
+}
+
+ul, ol { padding-left: calc( var(--line-height) * 2); }
+
+hr {
+    width: 62%;
+    margin-left: 0px;
+    color: var(--border-color);
+}
+
 blockquote {
-    margin: 0; 
     max-width: 100%; 
     font-style: italic;
     padding: var(--line-height) calc( var(--line-height) * 2);
@@ -123,16 +141,10 @@ img, table, figure, iframe, video {
     -ms-interpolation-mode: bicubic;
 }
 
-figure { margin: calc( var(--line-height) * 2) 0; }
-
-
-.cols figure {
-    padding-top: var(--line-height); 
-    margin: 0; 
-}
-
+figure { margin: calc( var(--line-height) * 2) 0}
+.cols figure.image { margin: calc( var(--line-height) * 1) 0}
 figure.table { padding-bottom: 0; }
-figure img { margin-bottom: 0; }
+figure.image img { margin-bottom: 0; }
 
 figure blockquote, figcaption, figure footer {
     padding: 0 var(--line-height);
@@ -157,11 +169,11 @@ figcaption, figure footer {
 }
 
 table { 
-    padding: var(--line-height) 0; 
+    width: 100%;
+    margin-top: calc( var(--line-height) * 1); 
     border-collapse: collapse;
     border-top: 1px solid var(--border-color); 
     border-bottom: 1px solid var(--border-color); 
-    margin-bottom: var(--line-height);
 }
 
 th { font-weight: bold; }
@@ -175,13 +187,18 @@ th, td {
 tbody tr:nth-child(even) { background-color: var(--background-color2); }
 
 .meta { display: none; }
+.summary .content p { display: inline; } 
+.more-link { margin-left: calc( (var(--line-height) / 2); }
 
 .cols {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    width: 100%;
+    display: flex;
+    column-gap: calc( var(--line-height) * 2); 
+    row-gap: 0;  
+    flex-shrink: 0; 
     margin: 0;
     padding: 0;
-} 
+}
 
 .clearfix::after {
     content: "";
@@ -189,10 +206,19 @@ tbody tr:nth-child(even) { background-color: var(--background-color2); }
     display: table;
 }
 
+.gist-data, .gist-meta { margin-bottom: 0; }
+
 input, textarea, button {
+    display: block;
     border: 0;
     font-family: inherit;
     font-size: inherit;
+    padding: calc( var(--line-height) / 3);
+    border-radius: calc( var(--line-height) / 3);
+}
+input { width: 60%; }
+textarea { 
+    width: 100%;
+    resize: vertical;
 }
 
-textarea { resize: vertical; }

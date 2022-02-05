@@ -1,3 +1,0 @@
-<nav id="nav-breadcrumbs">
-<a href="{{ .Parent.Permalink }}">⇡ {{ .Parent.Title }}</a>
-</nav>

@@ -1,8 +1,9 @@
 
-{{ $css := (sort (resources.Match "/css/**.scss") "Name") | resources.Concat "css/style.scss" | resources.ExecuteAsTemplate "css/main.scss" . | toCSS }}
-{{ if hugo.IsProduction }}
-    {{ $css = $css | minify | fingerprint | resources.PostProcess }}
+{{ with resources.Match "/css/**.css" }}
+    {{ $css := (sort . "Name") | resources.Concat "css/style.css" | toCSS }}
+    {{ if hugo.IsProduction }}
+        {{ $css = $css | minify | fingerprint }}
+    {{ end }}
+    <link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
+    <link rel="stylesheet" media="print" href="/css/print.css">
 {{ end }}
-<link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
-<link rel="stylesheet" media="print" href="/css/print.css">
-
