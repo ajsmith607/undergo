@@ -50,7 +50,7 @@ header, footer {
 }
 
 /* this accounts for 16% offset above */
-@media only screen and (max-width: 1000px) {
+@media only screen and (max-width: 1100px) {
     header, main, aside, footer { margin-left: auto; }
 }
 
@@ -118,7 +118,7 @@ h4, article h3, caption {
     font-weight: bold; 
 }
 
-ul, ol { padding-left: calc( var(--line-height) * 2); }
+ul, ol { padding-left: calc( var(--line-height) * 0.5); }
 
 hr {
     width: 62%;
@@ -145,12 +145,11 @@ figure { margin: calc( var(--line-height) * 2) 0}
 .cols figure.image { margin: calc( var(--line-height) * 1) 0}
 figure.table { padding-bottom: 0; }
 figure.image img { margin-bottom: 0; }
-
 figure blockquote, figcaption, figure footer {
     padding: 0 var(--line-height);
     font-style: normal; 
 }
-
+figure footer { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
 figure blockquote { padding: var(--line-height); }
 figcaption { margin: var(--line-height) 0;  }
 
@@ -165,7 +164,7 @@ figcaption { margin: var(--line-height) 0;  }
 .small, 
 table th, table td, tfoot, 
 figcaption, figure footer {
-    font-size: 0.85rem; 
+    font-size: 0.75rem; 
 }
 
 article .summary a.more-link { display: none; color: var(--color); }
