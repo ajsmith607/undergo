@@ -118,7 +118,8 @@ h4, article h3, caption {
     font-weight: bold; 
 }
 
-ul, ol { padding-left: calc( var(--line-height) * 0.5); }
+
+ul, ol, { padding-left: calc( var(--line-height) * 1.5 ) }
 
 hr {
     width: 62%;
@@ -152,6 +153,7 @@ figure blockquote, figcaption, figure footer {
 figure footer { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
 figure blockquote { padding: var(--line-height); }
 figcaption { margin: var(--line-height) 0;  }
+figure ul, ol { padding-left: calc( var(--line-height) * 0.5); }
 
 .quote-only { margin-bottom: calc( var(--line-height) * 2); }
 
