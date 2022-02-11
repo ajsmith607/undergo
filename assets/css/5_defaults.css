@@ -153,7 +153,7 @@ figure blockquote, figcaption, figure footer {
 figure footer { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
 figure blockquote { padding: var(--line-height); }
 figcaption { margin: var(--line-height) 0;  }
-figure ul, ol { padding-left: calc( var(--line-height) * 1); }
+figure ul, figure ol { padding-left: calc( var(--line-height) * 1); }
 
 .quote-only { margin-bottom: calc( var(--line-height) * 2); }
 
@@ -178,15 +178,12 @@ table {
     border-top: 1px solid var(--border-color); 
     border-bottom: 1px solid var(--border-color); 
 }
-
 th { font-weight: bold; }
-
 th, td { 
     line-height: var(--line-height);
     padding: calc( var(--line-height) / 8); 
     text-align: left;
 } 
-
 tbody tr:nth-child(even) { background-color: var(--background-color2); }
 
 .meta { display: none; }
@@ -201,12 +198,6 @@ tbody tr:nth-child(even) { background-color: var(--background-color2); }
     flex-shrink: 0; 
     margin: 0;
     padding: 0;
-}
-
-.clearfix::after {
-    content: "";
-    clear: both;
-    display: table;
 }
 
 .gist-data, .gist-meta { margin-bottom: 0; }

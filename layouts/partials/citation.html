@@ -1,0 +1,24 @@
+{{- with $.Scratch.Get "params" -}}
+    
+    {{- $cite := "" -}}
+    {{- with .citation -}}
+        {{- $cite = . -}}
+    {{- else -}}
+        {{- $c := slice }}
+        {{- with .pubdate -}} {{- $c = $c | append (time.Format "02 Jan 2006" .) -}} {{- end -}}
+        {{- with .author -}} {{- $c = $c | append . -}} {{- end -}}
+        {{- with .title -}} {{- $c = $c | append . -}} {{- end -}}
+        {{- with .voltitle -}} {{- $c = $c | append . -}} {{- end -}}
+        {{- with .publocation -}} {{- $c = $c | append . -}} {{- end -}}
+        {{- with .pages -}} {{- $c = $c | append (print "p" .) -}} {{- end -}}
+        {{- with .source -}} {{- $c = $c | append . -}} {{- end -}}
+        {{- $cite = delimit $c ", " -}}
+    {{- end -}}
+
+    {{- with $cite -}}
+        — <cite>{{ . | markdownify }} </cite>. 
+    {{- end -}}
+
+{{- end -}}
+
+

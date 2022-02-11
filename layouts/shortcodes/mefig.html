@@ -76,9 +76,8 @@
   <figcaption>
   {{ if  $resource }}
      {{- if in $displays "cite" -}}
-         {{- with $resource.Params.citation -}}
-             — <cite>{{- . | markdownify -}}</cite>&nbsp;
-         {{- end -}}
+        {{ $.Scratch.Set "params" $resource.Params }}
+        {{- partial "citation" $ -}}
      {{ end }}
   {{ end }}
   {{- if in $displays "link" -}}
