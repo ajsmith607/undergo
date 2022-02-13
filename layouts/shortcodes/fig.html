@@ -1,0 +1,93 @@
+{{- $basepath := printf "images/%s" (.Get 0) -}}           
+{{- $size := .Get 1 -}}
+{{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
+{{- $resizeAnchor := .Get 3 | default ("none") -}}
+{{ $pagebundlepath := .Get 4  | default (.Page.Params.defaultPageBundle) }}
+
+{{ $pagebundle := .Page.GetPage $pagebundlepath }}
+
+{{- $metafilename := printf "%s.md" $basepath -}}
+{{- $meta := $pagebundle.Resources.GetMatch $metafilename -}}
+{{- if $meta -}}
+{{- else -}}
+    {{- if not hugo.IsProduction -}}
+        no resource file at &nbsp; {{- $pagebundlepath -}} > {{- $metafilename -}} 
+    {{- end -}}
+{{- end -}}
+
+{{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
+{{- $height := "" -}}
+{{- with $size -}}
+    {{- if in . "x" -}}
+        {{- $dims := split . "x" -}}
+        {{- $width = index $dims 0 -}}
+        {{- $height = index $dims (sub (len $dims) 1) -}}
+    {{- else -}}
+        {{- $width = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $origrelref := "" -}}
+<figure class="image" style="max-width: {{- $width -}}px;">
+    {{- if in $displays "img" -}}
+        {{- $images := where ( $pagebundle.Resources.Match ( printf "%s.*" $basepath )) "MediaType.MainType" "image" -}}
+        {{- range $image := $images -}}
+            {{- $origrelref = $image.RelPermalink -}}
+            {{- if eq $resizeAnchor "none" -}}
+              {{- $resize := printf "%sx%s" $width $height -}}
+              {{- $image = $image.Resize $resize -}}
+            {{- else -}}
+              {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
+              {{- $image = $image.Fill $resize -}}
+            {{- end -}}
+            {{- $alt := "" -}}
+            {{- with $meta -}} {{- $alt = .Params.alt | markdownify -}} {{- end -}}
+            <img src="{{- $image.RelPermalink -}}" width="{{- $image.Width -}}" height="{{- $image.Height -}}" alt="{{- $alt -}} ">
+        {{- else -}}
+            {{- if not hugo.IsProduction -}}
+                no image at &nbsp; {{- $pagebundlepath }} > {{- $basepath -}} 
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if and $meta (in $displays "blockquote") -}}
+        {{- $quote := $meta.Content -}}
+        {{- if .Inner -}}
+            {{- $quote = .Inner -}}
+        {{- end -}}
+        {{- with $quote -}}
+            <blockquote>{{- . | markdownify  -}}</blockquote>
+        {{- end -}}
+    {{- end -}}
+
+    {{- if or (in $displays "cite") (in $displays "link") -}}
+        <figcaption>
+            {{- if and $meta (in $displays "cite") -}}
+                {{- $.Scratch.Set "params" $meta.Params -}}
+                {{- partial "citation" $ -}}
+            {{- end -}}
+            {{- if and $origrelref (in $displays "link") -}}
+                <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+            {{- end -}}
+        </figcaption>
+    {{- end -}}
+
+    {{- if and (in $displays "footer") $meta -}}
+        {{- with $meta.Params.footer -}}
+            <footer> {{- . | markdownify -}} </footer>
+        {{- end -}}
+    {{- end -}}
+
+    {{- if and (in $displays "aside") $meta -}}
+        {{- with $meta.Params.notes -}}
+            <aside> {{- . | markdownify -}} </aside>
+        {{- end -}}
+    {{- end -}}
+
+</figure>
+
+
+
+
+
+

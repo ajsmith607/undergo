@@ -146,13 +146,14 @@ figure { margin: calc( var(--line-height) * 2) 0}
 .cols figure.image { margin: calc( var(--line-height) * 1) 0}
 figure.table { padding-bottom: 0; }
 figure.image img { margin-bottom: 0; }
-figure blockquote, figcaption, figure footer {
+figure blockquote, figcaption, figure footer, figure aside {
     padding: 0 var(--line-height);
     font-style: normal; 
 }
-figure footer { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
+figure footer, figure aside { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
 figure blockquote { padding: var(--line-height); }
 figcaption { margin: var(--line-height) 0;  }
+figcaption a.origversion { padding-left: calc( var(--line-height) * 0.5); }
 figure ul, figure ol { padding-left: calc( var(--line-height) * 1); }
 
 .quote-only { margin-bottom: calc( var(--line-height) * 2); }
@@ -165,7 +166,7 @@ figure ul, figure ol { padding-left: calc( var(--line-height) * 1); }
 
 .small, 
 table th, table td, tfoot, 
-figcaption, figure footer {
+figcaption, figure footer, figure aside {
     font-size: 0.75rem; 
 }
 
