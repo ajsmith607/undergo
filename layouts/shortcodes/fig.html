@@ -1,12 +1,40 @@
-{{- $basepath := printf "images/%s" (.Get 0) -}}           
-{{- $size := .Get 1 -}}
+{{- $filebasename := printf "images/%s" (.Get 0) -}}           
+{{- $size := .Get 1 -}} 
+    {{/* size can be just width as unitless integer (like "800")
+         or a two integers separated by an x to indicate complete dimensions
+         (like "400x200") */}}
 {{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
 {{- $resizeAnchor := .Get 3 | default ("none") -}}
 {{ $pagebundlepath := .Get 4  | default (.Page.Params.defaultPageBundle) }}
 
+
+{{/* 
+
+Images are page resources are stored in the following folder structure:
+    > content > page > assets > images
+
+To accomodate the ability for multiple pages to reuse multiple assets,
+set the defaultPageBundle variable in the front matter of 
+in the (_)index.md file alongside the assets folder.
+
+For example, in content/firstpage/_index.md, add the following to the front matter:
+
+    cascade:
+        defaultPageBundle: "/firstpage/assets"
+
+Obviously, this can be overridden by the calling code with the fifth and final paramter.
+
+The assets folder must contain an index.md file of its own with the following front matter:
+
+    headless: true
+
+(This indicates a headless page bundle.)
+
+*/}}
+
 {{ $pagebundle := .Page.GetPage $pagebundlepath }}
 
-{{- $metafilename := printf "%s.md" $basepath -}}
+{{- $metafilename := printf "%s.md" $filebasename -}}
 {{- $meta := $pagebundle.Resources.GetMatch $metafilename -}}
 {{- if $meta -}}
 {{- else -}}
@@ -30,7 +58,7 @@
 {{- $origrelref := "" -}}
 <figure class="image" style="max-width: {{- $width -}}px;">
     {{- if in $displays "img" -}}
-        {{- $images := where ( $pagebundle.Resources.Match ( printf "%s.*" $basepath )) "MediaType.MainType" "image" -}}
+        {{- $images := where ( $pagebundle.Resources.Match ( printf "%s.*" $filebasename )) "MediaType.MainType" "image" -}}
         {{- range $image := $images -}}
             {{- $origrelref = $image.RelPermalink -}}
             {{- if eq $resizeAnchor "none" -}}
@@ -45,7 +73,7 @@
             <img src="{{- $image.RelPermalink -}}" width="{{- $image.Width -}}" height="{{- $image.Height -}}" alt="{{- $alt -}} ">
         {{- else -}}
             {{- if not hugo.IsProduction -}}
-                no image at &nbsp; {{- $pagebundlepath }} > {{- $basepath -}} 
+                no image at &nbsp; {{- $pagebundlepath }} > {{- $filebasename -}} 
             {{- end -}}
         {{- end -}}
     {{- end -}}
