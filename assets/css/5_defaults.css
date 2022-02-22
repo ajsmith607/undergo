@@ -155,7 +155,7 @@ figure blockquote { padding: var(--line-height); }
 figcaption { margin: var(--line-height) 0;  }
 figcaption a.origversion { padding-left: calc( var(--line-height) * 0.5); }
 figure ul, figure ol { padding-left: calc( var(--line-height) * 1); }
-
+cite { font-style: normal; /* reset of default browser style */  }
 .quote-only { margin-bottom: calc( var(--line-height) * 2); }
 
 .hero {
