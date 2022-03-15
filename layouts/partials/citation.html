@@ -13,10 +13,11 @@
         {{- with .pages -}} {{- $c = $c | append (print "p" .) -}} {{- end -}}
         {{- with .source -}} {{- $c = $c | append . -}} {{- end -}}
         {{- $cite = delimit $c ", " -}}
+        {{- $cite = printf "%s." $cite -}} 
     {{- end -}}
 
     {{- with $cite -}}
-        — <cite>{{- . | markdownify -}}</cite>. 
+        — <cite>{{- . | markdownify -}}</cite> 
     {{- end -}}
 
 {{- end -}}
