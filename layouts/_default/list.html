@@ -9,7 +9,7 @@
 		{{ end }}
 
         {{ if ne (default false (.Param "hideAutoListDisplay")) true }}
-            {{ range .Paginator.Pages }}
+            {{ range .Paginator.Pages.ByPublishDate }}
                 {{ .Render "summary" }}
             {{ end }}
             <nav class="nav-pages-lower"></nav>
