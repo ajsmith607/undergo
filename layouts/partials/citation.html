@@ -2,7 +2,9 @@
     
     {{- $cite := "" -}}
     {{- with .citation -}}
-        {{- $cite = . -}}
+        {{/* normalizing how ending periods are handled */}} 
+        {{/* removing temporarily if it is found */}} 
+        {{- $cite = replaceRE "\\.[\\s]*$" "" . -}}
     {{- else -}}
         {{- $c := slice }}
         {{- with .pubdate -}} {{- $c = $c | append (time.Format "02 Jan 2006" .) -}} {{- end -}}
@@ -13,11 +15,12 @@
         {{- with .pages -}} {{- $c = $c | append (print "p" .) -}} {{- end -}}
         {{- with .source -}} {{- $c = $c | append . -}} {{- end -}}
         {{- $cite = delimit $c ", " -}}
-        {{- $cite = printf "%s." $cite -}} 
     {{- end -}}
 
     {{- with $cite -}}
-        — <cite>{{- . | markdownify -}}</cite> 
+        {{/* normalizing how ending periods are handled */}} 
+        {{/* adding closing period */}} 
+— <cite>{{- . | markdownify -}}. </cite> 
     {{- end -}}
 
 {{- end -}}
