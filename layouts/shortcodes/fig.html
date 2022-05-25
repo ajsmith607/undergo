@@ -43,12 +43,6 @@ The assets folder must contain an index.md file of its own with the following fr
 {{- $resourcebundle := .Site.GetPage $resourcebundlepath -}}
 {{- $metafilename := printf "%s.md" $filebasepath -}}
 {{- $meta := $resourcebundle.Resources.GetMatch $metafilename -}}
-{{- if $meta -}}
-{{- else -}}
-    {{- if not hugo.IsProduction -}}
-        no resource file at &nbsp; {{- $resourcebundlepath -}} > {{- $metafilename -}} 
-    {{- end -}}
-{{- end -}}
 
 {{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
 {{- $height := "" -}}
@@ -82,6 +76,13 @@ The assets folder must contain an index.md file of its own with the following fr
             {{- if not hugo.IsProduction -}}
                 no image at &nbsp; {{- $resourcebundle}} > {{- $filebasepath -}} 
             {{- end -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if $meta -}}
+    {{- else -}}
+        {{- if not hugo.IsProduction -}}
+            no resource file at &nbsp; {{- $resourcebundlepath -}} > {{- $metafilename -}} 
         {{- end -}}
     {{- end -}}
 
