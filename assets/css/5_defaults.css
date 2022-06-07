@@ -135,7 +135,7 @@ blockquote {
     background-color: var(--background-color2);
 }
 
-img, table, figure, iframe, video {
+img, table, figure, video {
     max-width: 100%; 
     height: auto; 
     vertical-align: middle; 
@@ -158,6 +158,11 @@ figcaption a.origversion { padding-left: calc( var(--line-height) * 0.5); }
 figure ul, figure ol { padding-left: calc( var(--line-height) * 1); }
 cite { font-style: normal; /* reset of default browser style */  }
 .quote-only { margin-bottom: calc( var(--line-height) * 2); }
+
+pre {
+    background-color: var(--background-color2);
+    padding: 0 0 calc( var(--line-height) * 1) calc( var(--line-height) * 1); 
+}
 
 .hero {
     font-size: 4rem; 

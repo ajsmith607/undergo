@@ -71,7 +71,7 @@ The assets folder must contain an index.md file of its own with the following fr
             {{- end -}}
             {{- $alt := "" -}}
             {{- with $meta -}} {{- $alt = .Params.alt | markdownify -}} {{- end -}}
-            <img src="{{- $image.RelPermalink -}}" width="{{- $image.Width -}}" height="{{- $image.Height -}}" alt="{{- $alt -}} ">
+               <img src="{{- $image.RelPermalink -}}" width="{{- $image.Width -}}" height="{{- $image.Height -}}" alt="{{- $alt -}} ">
         {{- else -}}
             {{- if not hugo.IsProduction -}}
                 no image at &nbsp; {{- $resourcebundle}} > {{- $filebasepath -}} 

@@ -1,5 +1,7 @@
 {{ with .Get 0 }}
     {{ with resources.GetMatch . }}
         {{  .Content | safeHTML }}
+    {{ else }}
+       cannot find svg image at {{ . }}
     {{ end }}
 {{ end }}
