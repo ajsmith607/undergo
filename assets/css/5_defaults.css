@@ -141,6 +141,7 @@ img, table, figure, svg, iframe, video {
     border: 0; 
     -ms-interpolation-mode: bicubic;
 }
+img, table, figure, svg, video { height: auto; }
 
 figure { margin: calc( var(--line-height) * 2) 0}
 .cols figure.image { margin: calc( var(--line-height) * 1) 0}
