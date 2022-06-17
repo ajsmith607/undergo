@@ -1,10 +1,39 @@
+<script src="https://unpkg.com/@botpoison/browser" async></script>
 
-<form action="{{ with .Site.Params.contactformEndpoint }}{{.}} {{ end }}" method="POST" id="form-contact">
-  <input type="email" name="email" placeholder="email" required />
-  <input type="text" name="name" placeholder="name" required />
-  {{ with .Site.Params.contactformAntispam}}{{ . | safeHTML }}{{ end }}
-  <textarea name="message" cols="30" rows="10" placeholder="message"></textarea>
-  <button>Submit</button>
+<form id="form-contact" 
+      action="{{ with .Site.Params.contactformEndpoint }}{{.}}{{ end }}" 
+      data-botpoison-public-key="{{ with .Site.Params.botpoisonPublicKey }}{{.}}{{ end }}">
+  <input type="email" name="email" placeholder="email" required="" />
+  <input type="text" name="name" placeholder="name" required="" />
+  {{ with .Site.Params.contactformAdditionalCode}}{{ . | safeHTML }}{{ end }}
+  <textarea name="message" cols="30" rows="10" placeholder="message" required=""></textarea>
+  <button id="contact-submit-button" type="submit">Submit</button>
+  <div id="contact-progress" class="lds-ripple hidden"><div></div><div></div></div>
 </form>
 
+<script>
+    /*var buttonElement = document.getElementById("contact-submit-button");
+    buttonElement.onclick = function() {
+        buttonElement.setAttribute("disabled", "disabled");
+        var progressElement = document.getElementById("contact-progress");
+        progressElement.classList.remove("hidden");
+        return true;
+    }*/
+
+  var formElement = document.getElementById("form-contact");
+  var buttonElement = document.getElementById("contact-submit-button");
+  var progressElement = document.getElementById("contact-progress");
+  formElement.addEventListener("botpoison-challenge-start", function () {
+    buttonElement.setAttribute("disabled", "disabled");
+    progressElement.classList.remove("hidden");
+  });
+  formElement.addEventListener("botpoison-challenge-success", function () {
+    // progressElement.style.display = 'none';
+    // buttonElement.removeAttribute("disabled");
+  });
+  formElement.addEventListener("botpoison-challenge-error", function () {
+    // progressElement.style.display = 'none';
+    // buttonElement.removeAttribute("disabled");
+  });
+</script>
 
