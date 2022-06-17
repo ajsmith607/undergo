@@ -1,34 +1,37 @@
 {{ define "main" }}
-
-
-<main id="{{ with .Params.mainid }}{{ . }}{{ end }}"  class="single"> 
-    <article>
-        <h1>{{ .Title }}</h1>
-        <div class="meta">Last Update:
-            <time datetime="{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}" class="text-muted">
-                {{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}
-            </time>	
-        </div>
-        {{ with .TableOfContents }}
-        <!-- the variable is set -->
-        {{ if ne . "<nav id=\"TableOfContents\"></nav>" }}
-        <!-- the variable is not an empty navigation -->
-        <aside>{{ . }}</aside>
-        <!-- it's a dot because we are inside of a `with` -->
+    <main id="{{ with .Params.mainid }}{{ . }}{{ end }}"  class="single"> 
+        {{ with .Params.subhead}}
+            <div class="subhead">
+                {{ . }}
+            </div>
         {{ end }}
-        {{ end }}
-        <div>
-            {{ .Content }}
-        </div>
-        {{ partial "tags.html" . }}
-            {{ with .Site.DisqusShortname }}
-			<div>
-index.html  
-				{{ template "_internal/disqus.html" . }}
-			</div>
-			{{ end }}
-		</article>
-	</main>
+        <article>
+            <h1>{{ .Title }}</h1>
+            <div class="meta">Last Update:
+                <time datetime="{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}" class="text-muted">
+                    {{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}
+                </time>	
+            </div>
+            {{ with .TableOfContents }}
+            <!-- the variable is set -->
+            {{ if ne . "<nav id=\"TableOfContents\"></nav>" }}
+            <!-- the variable is not an empty navigation -->
+            <aside>{{ . }}</aside>
+            <!-- it's a dot because we are inside of a `with` -->
+            {{ end }}
+            {{ end }}
+            <div>
+                {{ .Content }}
+            </div>
+            {{ partial "tags.html" . }}
+                {{ with .Site.DisqusShortname }}
+                <div>
+    index.html  
+                    {{ template "_internal/disqus.html" . }}
+                </div>
+                {{ end }}
+            </article>
+        </main>
 {{ partial "sidebar.html" . }}
 {{ end }}
 
