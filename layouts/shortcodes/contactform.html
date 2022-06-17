@@ -7,19 +7,13 @@
   <input type="text" name="name" placeholder="name" required="" />
   {{ with .Site.Params.contactformAdditionalCode}}{{ . | safeHTML }}{{ end }}
   <textarea name="message" cols="30" rows="10" placeholder="message" required=""></textarea>
-  <button id="contact-submit-button" type="submit">Submit</button>
-  <div id="contact-progress" class="lds-ripple hidden"><div></div><div></div></div>
+  <div class="cols">
+      <button id="contact-submit-button" type="submit">Submit</button>
+      <div id="contact-progress" class="lds-facebook hidden"><div></div><div></div><div></div></div>
+  </div>
 </form>
 
 <script>
-    /*var buttonElement = document.getElementById("contact-submit-button");
-    buttonElement.onclick = function() {
-        buttonElement.setAttribute("disabled", "disabled");
-        var progressElement = document.getElementById("contact-progress");
-        progressElement.classList.remove("hidden");
-        return true;
-    }*/
-
   var formElement = document.getElementById("form-contact");
   var buttonElement = document.getElementById("contact-submit-button");
   var progressElement = document.getElementById("contact-progress");
