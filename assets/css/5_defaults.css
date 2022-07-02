@@ -172,7 +172,7 @@ pre {
 
 .small, 
 table th, table td, tfoot, 
-figcaption, figure footer, figure aside {
+figcaption, figure.image blockquote, figure footer, figure aside {
     font-size: 0.75rem; 
     vertical-align: top;
 }
