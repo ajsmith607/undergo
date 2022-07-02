@@ -202,10 +202,15 @@ tbody tr:nth-child(even) { background-color: var(--background-color2); }
 .cols {
     width: 100%;
     display: flex;
-    column-gap: calc( var(--line-height) * 2); 
+    flex-direction: row;
+    column-gap: var(--line-height); 
     row-gap: 0;  
-    flex-shrink: 0; 
-    align-items: start;
+    flex-basis: content;
+    flex-grow: 1;
+    flex-shrink: 1 ; 
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: flex-start;
     margin: 0;
     padding: 0;
 }
