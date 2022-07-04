@@ -13,14 +13,13 @@
                 </time>	
             </div>
             {{ with .TableOfContents }}
-            <!-- the variable is set -->
-            {{ if ne . "<nav id=\"TableOfContents\"></nav>" }}
-            <!-- the variable is not an empty navigation -->
-            <aside>{{ . }}</aside>
-            <!-- it's a dot because we are inside of a `with` -->
+                <!-- the variable is set -->
+                {{ if ne . "<nav id=\"TableOfContents\"></nav>" }}
+                <!-- the variable is not an empty navigation -->
+                <aside>{{ . }}</aside>
+                {{ end }}
             {{ end }}
-            {{ end }}
-            <div>
+            <div class="content">
                 {{ .Content }}
             </div>
             {{ partial "tags.html" . }}

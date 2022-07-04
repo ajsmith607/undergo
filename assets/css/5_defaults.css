@@ -101,23 +101,25 @@ a:visited, nav a:visited .copyright a:visited {
     text-decoration: none;
 }
 
-h1 { font-size: 3rem; }
-h2, article h1 { 
+h1, h2, h3 { font-weight: normal; }  
+h1 { 
     font-size: 2rem; 
+    padding-top: calc( var(--line-height) * 1);
+}
+h2 { 
+    font-size: 1.5rem; 
+    padding-top: calc( var(--line-height) * 1);
+    margin-bottom: calc( var(--line-height) / 2);
+}
+h3 { 
+    font-size: 1.25rem;
     padding-top: var(--line-height);
-    margin-bottom: calc( var(--line-height) /2); 
+    margin-bottom: calc( var(--line-height) / 2);
 }
-h1, h2, article h1 { 
-    line-height: calc( var(--line-height) * 2); 
-    font-weight: normal; 
-}
-h3, article h2 { font-size: 1.5rem; }
-h2, h3 { padding-top: calc( var(--line-height); }
-h4, article h3, caption { 
+h4 { 
     font-size: 1rem; 
-    font-weight: bold; 
+    font-weight: bold;
 }
-
 
 ul, ol { padding-left: calc( var(--line-height) * 1.5 ) }
 ul > li > ul > li, ol > li > ol > li { margin-bottom:  calc( var(--line-height) * 0.5) } 

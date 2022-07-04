@@ -1,7 +1,7 @@
 {{ $pagebundlepath := .Get 0  | default (.Page.Params.defaultPageBundle) }}
     {{ $pagebundle := .Page.GetPage $pagebundlepath }}
 
-<ul>
+<ul class="citations">
 {{ range $pagebundle.Resources.Match "*.md" }}
 <li>
     {{ if .Params.citation }}
