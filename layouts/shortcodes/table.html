@@ -52,10 +52,8 @@
 </table>
 <figcaption>
 {{ with $citation }}
-<tfoot>
-  — <cite>{{ . | markdownify }}</cite>
-</tfoot>
-{{ end }}
+— <cite>{{ . | markdownify }}</cite>.{{ end }}
+<a href="{{ substr $filename (len "/static") (len $filename) }}">Download source data.</a>
 </figcaption>
 </figure>
 {{ end }}

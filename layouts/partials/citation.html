@@ -1,5 +1,6 @@
 {{- with $.Scratch.Get "params" -}}
     
+    {{- $media := .media -}}
     {{- $cite := "" -}}
     {{- with .citation -}}
         {{/* normalizing how ending periods are handled */}} 
@@ -14,7 +15,6 @@
         {{- with .publocation -}} {{- $c = $c | append . -}} {{- end -}}
         {{- with .pages -}} {{- $c = $c | append (print "p" .) -}} {{- end -}}
         {{- with .source -}} {{- $c = $c | append . -}} {{- end -}}
-        {{- with .citepost -}} {{- $c = $c | append . -}} {{- end -}}
         {{- $cite = delimit $c ", " -}}
     {{- end -}}
 
@@ -22,6 +22,7 @@
         {{/* normalizing how ending periods are handled */}} 
         {{/* adding closing period */}} 
 — <cite>{{- . | markdownify -}}. </cite> 
+        {{- with $media -}} <span class="media">{{- . | markdownify -}}</span> {{- end -}}
     {{- end -}}
 
 {{- end -}}

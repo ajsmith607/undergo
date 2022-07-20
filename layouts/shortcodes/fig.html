@@ -115,9 +115,14 @@ The assets folder must contain an index.md file of its own with the following fr
     {{- end -}}
 
     {{- if and (in $displays "aside") $meta -}}
-        {{- with $meta.Params.notes -}}
-            <aside> {{- . | markdownify -}} </aside>
+        <aside>
+        {{- with $meta.Params.errata -}}
+            <div class="err">{{- . | markdownify -}}</div> 
         {{- end -}}
+        {{- with $meta.Params.notes -}}
+            <div class="notes">{{- . | markdownify -}}</div> 
+        {{- end -}}
+        </aside>
     {{- end -}}
 
 </figure>
