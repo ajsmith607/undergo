@@ -1,0 +1,5 @@
+{{- $headertext := .Get 0 | default "Contents" -}}
+<aside>
+    <h1>{{ $headertext }}</h1>
+    {{- .Page.TableOfContents -}}
+</aside>

@@ -59,21 +59,21 @@ header, footer {
     html,body { font-size: var(--mobile-font-size); }
 }
 
-nav {
+header nav {
     min-width: 300px;
     white-space: nowrap;
 }
 
-nav ul {
+header nav ul {
     display: flex;
 }
 
-nav ul, nav ul li {  
+header nav ul, header nav ul li {  
     padding: 0;
     margin: 0;
 }
 
-.homelink, nav ul li { 
+.homelink, header nav ul li { 
     display: inline-block;
     list-style-type: none;
     margin-right: var(--line-height);
@@ -111,7 +111,7 @@ h2 {
     padding-top: calc( var(--line-height) * 1);
     margin-bottom: calc( var(--line-height) / 2);
 }
-h3 { 
+h3, aside h1 { 
     font-size: 1.25rem;
     padding-top: var(--line-height);
     margin-bottom: calc( var(--line-height) / 2);
@@ -149,11 +149,11 @@ figure { margin: calc( var(--line-height) * 2) 0}
 .cols figure.image { margin: calc( var(--line-height) * 1) 0}
 figure.table { padding-bottom: 0; }
 figure.image img { margin-bottom: 0; }
-figure blockquote, figcaption, figure footer, figure aside {
+figure blockquote, figcaption, figure footer, figure aside, main aside {
     padding: 0 var(--line-height);
     font-style: normal; 
 }
-figure footer, figure aside { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
+figure footer, figure aside, main aside  { padding-top: 0; margin-left: 0 } /* resets style from top level footer */
 figure blockquote { padding: var(--line-height); }
 figcaption { margin: var(--line-height) 0;  }
 figcaption a.origversion { padding-left: calc( var(--line-height) * 0.5); }
