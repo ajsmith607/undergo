@@ -1,6 +1,6 @@
 {{ with .Params.tags }}
-<nav>
-    <ul class="tags">
+<nav class="tags">
+    <ul>
         {{ range . }}
         <li><a href="{{ "/tags/" | relLangURL }}{{ . | urlize }}">{{ . }}</a></li>
         {{ end }}
