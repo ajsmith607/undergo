@@ -4,6 +4,6 @@
     {{ if hugo.IsProduction }}
         {{ $css = $css | minify | fingerprint }}
     {{ end }}
-    <link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
-    <link rel="stylesheet" media="print" href="/css/print.css">
+    <link href="{{ $css.Permalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}"/>
+    <link rel="stylesheet" media="print" href="css/print.css">
 {{ end }}
