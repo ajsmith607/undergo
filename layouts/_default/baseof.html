@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ .Site.LanguageCode | default "en-us" }}">
     <head>
+        <base href={{ .Site.BaseURL }} />
         {{ partial "head-meta" . }}
         {{ partial "head-links" . }}
         {{ partial "head-css" . }}
