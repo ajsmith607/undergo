@@ -1,6 +1,6 @@
 <article class="summary"> 
 	
-<h3><a href="{{ .Permalink }}">{{ .Title }}</a></h3>
+<h3><a href="{{ .RelPermalink }}">{{ .Title }}</a></h3>
 
 <div class="meta">
     <time>{{ .Lastmod.Format (.Site.Params.humanDateFormat | default "1/2/2006")  }}</time>
@@ -8,7 +8,7 @@
 
 <div class="content">
 {{- .Summary -}}
-<a href="{{ .Permalink }}" class="more-link">read more</a>
+<a href="{{ .RelPermalink }}" class="more-link">read more</a>
 </div>
 
 {{ partial "tags.html" . }}

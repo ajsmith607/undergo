@@ -2,7 +2,7 @@
     <ul>
     {{ partial "homelink.html" . }} 
     {{ range .Site.Sections }}
-    <li><a href="{{ .Permalink }}">{{ .Section }}</a></li>
+    <li><a href="{{ .RelPermalink }}">{{ .Section }}</a></li>
     {{ end }}
     </ul>
 </nav>

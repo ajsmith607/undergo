@@ -2,8 +2,8 @@
 <!-- and insert shortcode "album albumName" in blogpost.md -->
 https://www.augusteo.com/blog/hugo-shortcode-to-display-all-images-in-a-folder/ 
 -->
-{{ $albumUrl := print "/static/img/" ($.Get 0) }}
+{{ $albumUrl := print "static/img/" ($.Get 0) }}
 {{ range readDir $albumUrl }}
-    {{ $imgURL := print "img/" ($.Get 0) "/" .Name | absURL }}
+    {{ $imgURL := print "img/" ($.Get 0) "/" .Name | relURL }}
     <p><img src="{{ $imgURL }}"/></p>
 {{ end }}

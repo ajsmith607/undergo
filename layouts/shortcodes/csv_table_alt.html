@@ -26,7 +26,7 @@
    {{ $.Scratch.Set "link" ( replace $src "static/" "" ) }}
 {{ end }}
   
-<a href="{{ $.Scratch.Get "link" | absURL}}" target="_blank">
+<a href="{{ $.Scratch.Get "link" | relURL}}" target="_blank">
 <div align=center>   
   <table class="table">
     <caption><b>{{ $.Scratch.Get "caption"}}</b></caption>
