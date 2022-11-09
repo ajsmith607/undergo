@@ -108,13 +108,13 @@ The assets folder must contain an index.md file of its own with the following fr
         </figcaption>
     {{- end -}}
 
-    {{- if and (in $displays "footer") $meta -}}
+    {{- if and $meta (in $displays "footer") -}}
         {{- with $meta.Params.footer -}}
             <footer> {{- . | markdownify -}} </footer>
         {{- end -}}
     {{- end -}}
 
-    {{- if and (in $displays "aside") $meta -}}
+    {{- if and $meta (in $displays "aside") -}}
         <aside>
         {{- with $meta.Params.notes -}}
             <div class="notes">{{- . | markdownify -}}</div> 

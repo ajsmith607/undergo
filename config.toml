@@ -1,2 +1,29 @@
-
-
+[params]
+  humanDateFormat = "Monday 02 Jan 2006"
+  ImageMaxWidth = "800"
+  
+[markup]
+  defaultMarkdownHandler = "goldmark"
+  [markup.goldmark]
+    [markup.goldmark.extensions]
+      definitionList = true
+      footnote = true
+      linkify = true
+      strikethrough = true
+      table = true
+      taskList = true
+      typographer = true
+    [markup.goldmark.parser]
+      autoHeadingID = true
+      autoHeadingIDType = "github"
+      [markup.goldmark.parser.attribute]
+        block = false
+        title = true
+    [markup.goldmark.renderer]
+      hardWraps = false
+      unsafe = true
+      xhtml = false
+  [markup.tableOfContents]
+    endLevel = 2
+    ordered = false
+    startLevel = 2
