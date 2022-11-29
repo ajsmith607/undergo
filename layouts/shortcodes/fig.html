@@ -81,9 +81,6 @@ The assets folder must contain an index.md file of its own with the following fr
 
     {{- if $meta -}}
     {{- else -}}
-        {{- if not hugo.IsProduction -}}
-            no resource file at &nbsp; {{- $resourcebundlepath -}} > {{- $metafilename -}} 
-        {{- end -}}
     {{- end -}}
 
     {{- if and $meta (in $displays "blockquote") -}}

@@ -134,7 +134,6 @@ hr {
 
 blockquote {
     max-width: 100%; 
-    font-style: italic;
     padding: var(--line-height) calc( var(--line-height) * 2);
     background-color: var(--background-color2);
 }
