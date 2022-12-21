@@ -1,6 +1,6 @@
 {{ $toplevel := .Get 0 }}
 {{ $toplabel := .Get 1 }}
-
+{{ $topsummary := "" }}
  {{ $toppage:= .Page }}
  {{ $rpages := .Page.RegularPages }}
  {{ if $toplevel }}
@@ -10,12 +10,16 @@
 
 {{ if and (not $toplabel) (ne $toppage .Page) }}
     {{ $toplabel = $toppage.Title }}
+    {{ $topsummary = $toppage.Summary}}
 {{ end }}
 
 <section>
 <article>
 {{- with $toplabel -}}
 <h2>{{ . }}</h2>
+{{- end -}}
+{{- with $topsummary -}}
+<p class="summary">{{ . }}</p>
 {{- end -}}
 {{ range $rpages }}
 {{ .Render "summary" }}
