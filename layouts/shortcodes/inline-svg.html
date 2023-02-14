@@ -1,7 +1,6 @@
-{{ with .Get 0 }}
-    {{ with resources.GetMatch . }}
-        {{  .Content | safeHTML }}
-    {{ else }}
-       cannot find svg image at {{ . }}
-    {{ end }}
+{{- $svg := .Get 0 -}} 
+{{ with .Page.Resources.GetMatch $svg }}
+    {{  .Content | safeHTML }}
+{{ else }}
+    cannot find svg image at {{ . }}
 {{ end }}
