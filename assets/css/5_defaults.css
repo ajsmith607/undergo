@@ -45,6 +45,8 @@ header, main, aside, footer {
     max-width: var(--max-width);
 }
 
+aside.toc { padding-bottom: calc( var(--line-height) * 1); }
+
 header, footer {
     padding-top: calc( var(--line-height) * 1);
 }

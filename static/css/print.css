@@ -20,8 +20,8 @@
     /* Font auf 16px/13pt setzen, Background auf Weiß und Schrift auf Schwarz setzen.*/
     /* Das spart Tinte */
     body {
-        font: 13pt Georgia, "Times New Roman", Times, serif;
-        line-height: 1.3;
+        font: 12pt Georgia, "Times New Roman", Times, serif;
+        line-height: 1.2;
         background: #fff !important;
         color: #000;
     }
@@ -125,3 +125,15 @@
     }    
         
     }
+
+/**
+ * My additions
+ *
+ * **/
+
+main, main.single, article { margin: 2%; padding: 0; max-width:100%; }
+figure.image blockquote, figure blockquote, blockquote, cite, figure aside { font-size: 10pt; }
+figure blockquote, figure, blockquote {background-color: white; padding: 5px 45px; margin: 5px 15px; }
+blockquote { padding-left: 40px: 40px; border-left: 2px solid black; }
+cite, aside { overflow-wrap: anywhere; }
+a.origversion { display: none; }

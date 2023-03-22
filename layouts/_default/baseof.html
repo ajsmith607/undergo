@@ -1,7 +1,11 @@
 <!DOCTYPE html>
 <html lang="{{ .Site.LanguageCode | default "en-us" }}">
     <head>
-        <base href={{ .Site.BaseURL }} />
+        <!-- 
+            a base url breaks toc rendering of markdown toc
+            workaround is to comment out
+            see https://github.com/gohugoio/hugo/issues/811
+            <base href={{ .Site.BaseURL }} /> -->
         {{ partial "head-meta" . }}
         {{ partial "head-links" . }}
         {{ partial "head-css" . }}
