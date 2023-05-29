@@ -1,0 +1,148 @@
+{{/*
+
+This organizes a CSV file to map columns and row values.
+
+Embed formatting hints into column name, where column name is X:
+  - X-i : type is integer 
+  - X-f : type is float 
+  - X-b : display bold
+  - X-c : center align column
+  - X-r : right align column 
+  - X-a : default sort ascending 
+  - X-d : default sort descending 
+  - x-nw : force values to not wrap in cell
+
+Pass multiple options accordingly:
+  - age-n-c-b
+
+X-link will create a link of the column named X.
+X-sort will be used to sort column named X.
+
+Remember that if you rename columns, any corresponding X-link and X-sort columns will also need to be renamed to refer back to them properly. Ex.:
+
+  name-b       -->   name-b-nw
+  name-b-link  -->   name-b-nw-link
+
+
+(time.Format $datefmt .)
+
+*/}}
+
+{{ $filename := .Get 0  }}
+{{ $id := .Get 1  }}
+{{ $cols := .Get 2 | lower }}
+{{ $citation := .Get 3 }}
+{{ $wherekey := .Get 4 | lower }}
+{{ $whereop := .Get 5 }}
+{{ $wherematch := .Get 6 }}
+{{ $datefmt := .Get 7 | default "02 Jan 2006"  }}
+{{ $boldrownums := split ( .Get 8 ) "," }}
+
+{{ $csv := getCSV "," $filename }}
+
+{{ $headerRow := index $csv 0 }}
+{{ $datarows := after 1 $csv }}
+
+{{ $data := slice }}
+{{ range $i, $row := $datarows }}
+  {{ $mappedrow := dict }}
+  {{ range $j, $rowlabel := $headerRow }}
+    {{ $rowlabel = $rowlabel | lower }}
+    {{ $mappedrow = merge $mappedrow (dict $rowlabel (index $row $j)) }}
+  {{ end }}
+  {{ $data = $data | append $mappedrow }}
+{{ end }}
+
+{{ with (and $wherekey $whereop $wherematch ) }}
+    {{ $data = where $data $wherekey $whereop $wherematch }}
+{{ end }}
+    
+{{ $displayoptions := slice "i" "f" "b" "c" "r" "a" "d" "nw" }}
+
+{{ $aside := "" }}
+{{ if .Inner }}
+    {{ $aside = .Inner }}
+{{ end }}
+
+{{ $includecols := split $cols "," }}
+{{ with $data }}
+
+<figure class="table" > 
+<table id="{{ $id }}">
+<thead>
+<tr> 
+
+    {{ range $includecols }} 
+        {{ $nameparts := split . "-" }}
+        {{ $hints := intersect $displayoptions $nameparts }}
+
+        {{ $type := "string" }}
+        {{ if in $hints "i" }} {{ $type = "int" }} {{ end }}
+        {{ if in $hints "f" }} {{ $type = "float" }} {{ end }}
+
+        {{ $order := "" }}
+        {{ if in $hints "a" }} {{ $order = "asc" }} {{ end }}
+        {{ if in $hints "d" }} {{ $order = "desc" }} {{ end }}
+
+        {{ $style := slice }}
+        {{ if in $hints "b" }}  {{ $style = $style | append "font-weight:bold" }}   {{ end }}
+        {{ if in $hints "c" }}  {{ $style = $style | append "text-align:center" }}  {{ end }}
+        {{ if in $hints "r" }}  {{ $style = $style | append "text-align:right" }}   {{ end }}
+        {{ if in $hints "nw" }} {{ $style = $style | append "white-space:nowrap" }} {{ end }}
+
+        {{ $displayname := complement $displayoptions $nameparts }}
+<th {{ with $style }} style="{{ delimit . ";" | safeCSS }}" {{ end }} data-sort="{{ $type }}" {{ with $order }}data-sort-default="{{ $order }}"{{ end }}>{{ delimit $displayname " " | humanize }} </th> 
+    {{ end }} 
+</tr>
+</thead>
+
+<tbody>
+    {{ $i := 0 }}
+    {{ range $row := . }}    
+<tr>
+        {{ range $includecols }} 
+            {{ $value := index $row . }}
+            {{ $value := $value }}
+
+            {{ $nameparts := split . "-" }}
+            {{ $hints := intersect $displayoptions $nameparts }}
+            
+            {{ $sortcolname := printf "%s-%s" . "sort" }}
+            {{ $sort := index $row $sortcolname | default $value }}
+
+            {{ if in $hints "d" }}  {{  $value = (time.Format $datefmt $value) }}   {{ end }}
+            
+            {{ $linkcolname := printf "%s-%s" . "link" }}
+            {{ $link := index $row $linkcolname }}
+            {{ with $link }} {{ $value = printf "<a href=\"%s\">%s</a>" $link ( $value | safeURL ) }} {{ end }}
+
+            {{ $style := slice }}
+            {{ if or ( in $hints "b" ) ( in $boldrownums ( string $i ) ) }}  {{ $style = $style | append "font-weight:bold" }}   {{ end }}
+            {{ if in $hints "c" }}  {{ $style = $style | append "text-align:center" }}  {{ end }}
+            {{ if in $hints "r" }}  {{ $style = $style | append "text-align:right" }}   {{ end }}
+            {{ if in $hints "nw" }} {{ $style = $style | append "white-space:nowrap" }} {{ end }}
+
+<td {{ with $style }} style="{{ delimit . ";" | safeCSS }}" {{ end }} data-sort-value="{{ $sort }}"> {{ $value | safeHTML }}</td>
+        {{ end }}
+        {{ $i = add $i 1 }}
+</tr>
+    {{ end }}
+</tbody>
+</table>
+<figcaption>
+{{ with $citation }}
+— <cite>{{ . | markdownify }}</cite>{{ end }}
+Click column headers to change sort order.
+<a href="{{ substr $filename (len "/static") (len $filename) }}">Download source data.</a>
+</figcaption>
+{{ with $aside }}<aside>{{ . | safeHTML }}</aside>{{ end }}
+</figure>
+{{ end }}
+
+<script>
+  jQuery(document).ready(function () {
+      $("#{{ $id }}").stupidtable();
+  });
+</script>
+
+<!-- https://randomgeekery.org/post/2020/06/csv-and-data-tables-in-hugo/ -->

@@ -1,4 +1,4 @@
-
+{{/* DEPRECATED: use autotable */}}
 
 {{ $filename := .Get 0  }}
 {{ $id := .Get 1  }}
@@ -27,8 +27,8 @@
 {{ end }}
 
 {{ with $data }}
-<figure class="table" id="{{ $id }}"> 
-    <table>
+<figure class="table" > 
+    <table id="{{ $id }}">
 
 <thead>
 <tr> 
@@ -53,6 +53,7 @@
 <figcaption>
 {{ with $citation }}
 — <cite>{{ . | markdownify }}</cite>.{{ end }}
+Click column headers to change sort order.
 <a href="{{ substr $filename (len "/static") (len $filename) }}">Download source data.</a>
 </figcaption>
 </figure>
@@ -60,7 +61,7 @@
 
 <script>
   jQuery(document).ready(function () {
-      //$("#{{ $id }}").stupidtable();
+      $("#{{ $id }}").stupidtable();
   });
 </script>
 
