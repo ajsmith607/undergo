@@ -15,7 +15,7 @@ Embed formatting hints into column name, where column name is X:
 Pass multiple options accordingly:
   - age-n-c-b
 
-X-link will create a link of the column named X.
+X-link for a URL field that will create a link of the text in column named X.
 X-sort will be used to sort column named X.
 
 Remember that if you rename columns, any corresponding X-link and X-sort columns will also need to be renamed to refer back to them properly. Ex.:
@@ -23,18 +23,15 @@ Remember that if you rename columns, any corresponding X-link and X-sort columns
   name-b       -->   name-b-nw
   name-b-link  -->   name-b-nw-link
 
-
-(time.Format $datefmt .)
-
 */}}
 
 {{ $filename := .Get 0  }}
 {{ $id := .Get 1  }}
 {{ $cols := .Get 2 | lower }}
 {{ $citation := .Get 3 }}
-{{ $wherekey := .Get 4 | lower }}
-{{ $whereop := .Get 5 }}
-{{ $wherematch := .Get 6 }}
+{{ $wherekey := .Get 4 | lower | default "" }}
+{{ $whereop := .Get 5 | lower | default ""}}
+{{ $wherematch := .Get 6 | default "" }}
 {{ $datefmt := .Get 7 | default "02 Jan 2006"  }}
 {{ $boldrownums := split ( .Get 8 ) "," }}
 
@@ -110,7 +107,7 @@ Remember that if you rename columns, any corresponding X-link and X-sort columns
             {{ $sortcolname := printf "%s-%s" . "sort" }}
             {{ $sort := index $row $sortcolname | default $value }}
 
-            {{ if in $hints "d" }}  {{  $value = (time.Format $datefmt $value) }}   {{ end }}
+            {{ if in $hints "d" }}  {{  $value = (time.Format $datefmt $value) | default $value }}   {{ end }}
             
             {{ $linkcolname := printf "%s-%s" . "link" }}
             {{ $link := index $row $linkcolname }}
