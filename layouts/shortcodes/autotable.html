@@ -40,6 +40,7 @@ Remember that if you rename columns, any corresponding X-link and X-sort columns
 {{ $headerRow := index $csv 0 }}
 {{ $datarows := after 1 $csv }}
 
+
 {{ $data := slice }}
 {{ range $i, $row := $datarows }}
   {{ $mappedrow := dict }}
@@ -53,7 +54,11 @@ Remember that if you rename columns, any corresponding X-link and X-sort columns
 {{ with (and $wherekey $whereop $wherematch ) }}
     {{ $data = where $data $wherekey $whereop $wherematch }}
 {{ end }}
-    
+   
+{{ with $data }} {{ else }}
+  {{- errorf "No data to display in %s autotable in %s. Looking in %s for '%s %s %s'." $id .Page.RelPermalink $filename $wherekey $whereop $wherematch -}} 
+{{- end -}}
+
 {{ $displayoptions := slice "i" "f" "b" "c" "r" "a" "d" "nw" }}
 
 {{ $aside := "" }}
