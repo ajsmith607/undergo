@@ -43,6 +43,7 @@ The assets folder must contain an index.md file of its own with the following fr
 {{- $resourcebundle := .Site.GetPage $resourcebundlepath -}}
 {{- $metafilename := printf "%s.md" $filebasepath -}}
 {{- $meta := $resourcebundle.Resources.GetMatch $metafilename -}}
+{{- $fullsizelinks:= $.Site.Params.FullSizeLinks | default "false" -}}
 
 {{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
 {{- $height := "" -}}
@@ -100,7 +101,9 @@ The assets folder must contain an index.md file of its own with the following fr
                 {{- partial "citation" $ -}}
             {{- end -}}
             {{- if and $origrelref (in $displays "link") -}}
-                <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+                {{- if $fullsizelinks -}}
+                    <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+                {{- end -}}
             {{- end -}}
         </figcaption>
     {{- end -}}
