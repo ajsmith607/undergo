@@ -1,3 +1,3 @@
-module github.com/ajs17/hugo-min-components
+module github.com/ajsmith607/undergo
 
-go 1.16
+go 1.20
