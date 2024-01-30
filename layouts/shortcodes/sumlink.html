@@ -1,0 +1,7 @@
+
+{{- $pagename := .Get 0 -}}           
+{{- $page:= .Site.GetPage $pagename -}}
+{{- with $page -}}
+    <p>{{- .Summary -}}</p>
+    <p>To read more, see the {{- .LinkTitle -}} section</p>
+{{- end -}}

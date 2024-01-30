@@ -1,0 +1,5 @@
+{{- $pagename := .Get 0 -}}           
+{{- $page:= .Site.GetPage $pagename -}}
+{{- with $page -}}
+    <a href="{{- .RelRef -}}">{{- .LinkTitle -}}</a>
+{{- end -}}

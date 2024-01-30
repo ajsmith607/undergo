@@ -199,6 +199,7 @@ th, td {
 } 
 thead tr, tbody tr:nth-child(even) { background-color: var(--background-color2); }
 
+dt { font-weight: bold; }
 .meta { display: none; }
 .summary .content p { display: inline; } 
 .more-link { margin-left: calc( (var(--line-height) / 2); }
