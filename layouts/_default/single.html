@@ -16,12 +16,6 @@
                 {{ .Content }}
             </div>
             {{ partial "tags.html" . }}
-                {{ with .Site.DisqusShortname }}
-                <div>
-    index.html  
-                    {{ template "_internal/disqus.html" . }}
-                </div>
-                {{ end }}
             </article>
         </main>
 {{ partial "sidebar.html" . }}

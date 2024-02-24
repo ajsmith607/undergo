@@ -1,5 +1,17 @@
 {{- $pagename := .Get 0 -}}           
-{{- $page:= .Site.GetPage $pagename -}}
+{{- $mark := "" -}}
+{{- if strings.Contains $pagename "#" -}}
+    {{- $pagerefparts := split $pagename "#" -}}
+    {{- $pagename = index $pagerefparts 0 -}}
+    {{- $mark = index $pagerefparts 1 -}}
+    {{- $mark = printf "#%s" $mark -}}
+{{- end -}}
+
+{{- $linktext := .Get 1 -}}
+
+{{- $page := .Site.GetPage $pagename -}}
 {{- with $page -}}
-    <a href="{{- .RelRef -}}">{{- .LinkTitle -}}</a>
+    {{- $rellink := printf "%s%s" .RelPermalink $mark -}}
+    {{- $linktext = $linktext | default .LinkTitle -}}
+    <a href="{{- $rellink -}}">{{- $linktext -}}</a>
 {{- end -}}
