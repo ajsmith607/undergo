@@ -1,15 +1,5 @@
 
 
-
-{{/* ********************************   */}}
-{{/* CONFIG                             */}}
-{{/* ********************************   */}}
-
-{{/* location of overall site image assets by convention */}}         
-{{- $relimgdir := "/_assets/images" -}}
-
-
-
 {{/* ********************************   */}}
 {{/* PARAMS                             */}}
 {{/* ********************************   */}}
@@ -59,14 +49,16 @@
 {{/* ********************************   */}}
 
 {{/* adjust the image path to be relative to /_index.md bundle within /content (aka "/") */}}
-{{- $fullimgrelref := path.Join $relimgdir (print $shortkey "." (index $data "imgext")) -}}           
+{{- $fullimgrelref := path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
 
 {{- if hugo.IsProduction -}}
+    {{/* in production, use /content/_assets/_index.md as the headless page bundle for production image resources */}}
     
-    {{ warnf "!!!! PRODUCTION RUN, images will be resized !!!!" }}
+    {{- warnf "!!!! PRODUCTION RUN, images will be resized !!!!" -}}
 
-    {{- $home := site.Home -}}
-    {{- $image := $home.Resources.Get $fullimgrelref -}}
+    {{- $assets := site.GetPage "/_assets" -}}                     {{/* the headless bundle */}}
+    {{- if not $assets -}}{{- errorf "No /_assets bundle visible; check mounts/excludes" -}}{{- end -}}
+    {{- $image := $assets.Resources.Get $fullimgrelref -}}
     {{- with $image -}}
 
         {{- if eq $resizeAnchor "none" -}}
@@ -82,10 +74,14 @@
         {{- $height = $image.Height -}}
 
     {{- else -}}
-        {{- errorf "No image resource at %s in bundle %s" $fullimgrelref .Page.File.Path -}} 
+        {{- errorf "No image resource at %s in bundle %s" $fullimgrelref $assets.Path -}} 
         {{- errorf "Using shortkey: %s" $shortkey -}} 
     {{- end -}}
 
+{{- else -}}
+    {{/* in development , use full path from site home (/) to statically reference file without resource processing  */}}
+    {{- $fullimgrelref = path.Join "/_assets" $fullimgrelref -}}  {{/* must have leading slash */}}          
+    {{- warnf "IMG $fullimgrelref: %s" $fullimgrelref -}}
 {{- end -}}
 
 
