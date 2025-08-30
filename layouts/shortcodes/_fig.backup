@@ -1,0 +1,169 @@
+
+{{/* 
+
+Diplay image and related metdata for a page resource contained in a subdirectory called 'assets/images'.
+
+To better accomodate the ability for multiple pages to reuse multiple assets, set the defaultResourceBundlePath variable in the front matter of in the (_)index.md file alongside the assets folder.
+
+For example, in content/firstpage/_index.md, add the following to the front matter:
+
+    cascade:
+        defaultResourceBundlePath: "/people/mills-edward-hallock-1819-family"
+
+So, under the page:
+    /people/mills-edward-hallock-1819-family
+
+to include an image at:
+    assets/images/census/census-1860-us.jgp 
+
+include a shortcode such as:
+    {{% fig "census/census-1860-us" "250" /%}}
+
+And obviously, this can be overridden on a per-case basis by the calling code with the fifth and final paramter.
+
+The assets folder must contain an index.md file of its own with the following front matter:
+
+    headless: true
+
+(This indicates a headless page bundle.)
+
+*/}}
+
+
+{{- $filebasepath := path.Join "images" (.Get 0) -}}           
+{{- $size := .Get 1 -}} 
+    {{/* size can be just width as unitless integer (like "800")
+         or a two integers separated by an x to indicate complete dimensions
+         (like "400x200") */}}
+{{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
+{{- $resizeAnchor := .Get 3 | default "none" -}}
+{{- $resourcebundlepath := path.Join ( .Get 4 | default .Page.Params.defaultResourceBundlePath ) "assets" -}}
+
+
+{{- $resourcebundle := .Site.GetPage $resourcebundlepath -}}
+{{- $metafilename := printf "%s.md" $filebasepath -}}
+{{- $meta := $resourcebundle.Resources.GetMatch $metafilename -}}
+{{- $fullsizelinks:= $.Site.Params.FullSizeLinks | default "false" -}}
+
+{{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
+{{- $height := "" -}}
+{{- with $size -}}
+    {{- if in . "x" -}}
+        {{- $dims := split . "x" -}}
+        {{- $width = index $dims 0 -}}
+        {{- $height = index $dims (sub (len $dims) 1) -}}
+    {{- else -}}
+        {{- $width = . -}}
+    {{- end -}}
+{{- end -}}
+
+{{- $origrelref := "" -}}
+<figure class="image" style="max-width: {{- $width -}}px;">
+    {{- if in $displays "img" -}}
+        {{- $images := where ( $resourcebundle.Resources.Match ( printf "%s.*" $filebasepath )) "MediaType.MainType" "image" -}}
+        {{- range $image := $images -}}
+            {{- $origrelref = $image.RelPermalink -}}
+            {{- if eq $resizeAnchor "none" -}}
+              {{- $resize := printf "%sx%s" $width $height -}}
+              {{- $image = $image.Resize $resize -}}
+            {{- else -}}
+              {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
+              {{- $image = $image.Fill $resize -}}
+            {{- end -}}
+            {{- $alt := "" -}}
+            {{- with $meta -}} {{- $alt = .Params.alt | markdownify -}} {{- end -}}
+               <img src="{{- $image.RelPermalink -}}" width="{{- $image.Width -}}" height="{{- $image.Height -}}" alt="{{- $alt -}} ">
+        {{- else -}}
+            {{- if hugo.IsProduction -}}
+                {{- errorf "No image at %s/%s in %s." $resourcebundlepath $filebasepath .Page.Path -}} 
+            {{- else -}}
+                {{- warnf "fig.backup No image at %s/%s in %s." $resourcebundlepath $filebasepath .Page.Path -}} 
+                <div style="color: red">
+                    No image at &nbsp; {{- $resourcebundlepath -}}/{{- $filebasepath -}}  &nbsp; in &nbsp;  {{- .Page.Path -}}
+                </div>
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+
+    {{- if $meta -}}
+    {{- else -}}
+    {{- end -}}
+
+    {{- if and $meta (in $displays "blockquote") -}}
+        {{- $quote := $meta.Content -}}
+        {{- if .Inner -}}
+            {{- $quote = .Inner -}}
+        {{- end -}}
+        {{- with $quote -}}
+            <blockquote>{{- . | markdownify  -}}</blockquote>
+        {{- end -}}
+    {{- end -}}
+
+    {{- if or (in $displays "cite") (in $displays "link") -}}
+        <figcaption>
+            {{- if and $meta (in $displays "cite") -}}
+                {{- $.Scratch.Set "params" $meta.Params -}}
+                {{- partial "citation" $ -}}
+            {{- end -}}
+            {{- if and $origrelref (in $displays "link") -}}
+                {{- if $fullsizelinks -}}
+                    <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+                {{- end -}}
+            {{- end -}}
+        </figcaption>
+    {{- end -}}
+
+    {{- if and $meta (in $displays "footer") -}}
+        {{- with $meta.Params.footer -}}
+            <footer> {{- . | markdownify -}} </footer>
+        {{- end -}}
+    {{- end -}}
+
+    {{- if and $meta (in $displays "aside") -}}
+        <aside>
+        {{- with $meta.Params.notes -}}
+            <div class="notes">{{- . | markdownify -}}</div> 
+        {{- end -}}
+        </aside>
+    {{- end -}}
+</figure>
+
+
+
+{{/* 
+
+The goals of the site are fundamentally at odds with the Hugo content model, which I needed to bend with the setup described above :
+  - Each image has an associated .md file with:
+      - markdown formatted metadata in YAML front matter, and 
+      - transcriptions as markdown content.
+    ... that is to say, these files are not content pages but 
+  - For logical file maintenance, I want to keep the image and metadata files together, with the same basename.
+  - Images must be treated as resources to give access to image manipulation functions.
+  - I want to leverage Hugo's built-in ability to parse markdown files with front matter, meaning they must be treated as resources. But doing so means that Hugo must treat each of these markdown files as Page objects. (Maybe that's OK?)
+
+Moving assets directory above content directory will stop pages being generated for each .md file, but then you lose the ability to treat .md files as resources. Also, this would seem to make the "view largest available size" option unavailable without additional work.
+
+Also understand these differences in Hugo:
+
+_index.md = defines SECTIONS (section landing page)
+  - can only define cascading properties in these files and apply to descendant cotent pages
+  - treated as a rendered page
+  - each .md file in subcontent is rendered as page
+  - .md files CANNOT be treated as resources (unless there is no front matter?); they are treated as child pages.
+  - therefore cannot be used to group related files one resource bundle
+
+index.md = defines SINGLE pages ("leaf bundle")
+  - CANNOT define cascading properties or have cascading properties applied 
+  - treated as a rendered page
+  - .md files in subcontent are not rendered as pages, they are resources (TRUE?)
+  - can be used to group related files in one resource bundle
+
+You cannot define both _index.md and index.md in the same folder.
+
+In summary, the following approaches have not worked:
+  - storing assets above content (in SITE_ROOT/assets), not able to treat .md files as resources or even as markdown internally, no automatic public access to original image without additional workaround
+  - treating assets as sections with cascading properties (under _index.md), fundamentally incompatible for the reasons given above
+  - defnining headless: true in the front matter of all .md files appears to have no impact, Hugo needs to treat these as Pages, even if the content is not rendered. (maybe not, after cache implementation) 
+
+
+*/}}

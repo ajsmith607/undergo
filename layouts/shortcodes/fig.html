@@ -1,49 +1,28 @@
 
-{{/* 
-
-Diplay image and related metdata for a page resource contained in a subdirectory called 'assets/images'.
-
-To better accomodate the ability for multiple pages to reuse multiple assets, set the defaultResourceBundlePath variable in the front matter of in the (_)index.md file alongside the assets folder.
-
-For example, in content/firstpage/_index.md, add the following to the front matter:
-
-    cascade:
-        defaultResourceBundlePath: "/people/mills-edward-hallock-1819-family"
-
-So, under the page:
-    /people/mills-edward-hallock-1819-family
-
-to include an image at:
-    assets/images/census/census-1860-us.jgp 
-
-include a shortcode such as:
-    {{% fig "census/census-1860-us" "250" /%}}
-
-And obviously, this can be overridden on a per-case basis by the calling code with the fifth and final paramter.
-
-The assets folder must contain an index.md file of its own with the following front matter:
-
-    headless: true
-
-(This indicates a headless page bundle.)
-
-*/}}
 
 
-{{- $filebasepath := path.Join "images" (.Get 0) -}}           
+{{/* ********************************   */}}
+{{/* CONFIG                             */}}
+{{/* ********************************   */}}
+
+{{/* location of overall site image assets by convention */}}         
+{{- $relimgdir := "/_assets/images" -}}
+
+
+
+{{/* ********************************   */}}
+{{/* PARAMS                             */}}
+{{/* ********************************   */}}
+
+{{- $shortkey := .Get 0 -}}           
 {{- $size := .Get 1 -}} 
     {{/* size can be just width as unitless integer (like "800")
-         or a two integers separated by an x to indicate complete dimensions
+         or as two integers separated by an x to indicate complete dimensions
          (like "400x200") */}}
 {{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
 {{- $resizeAnchor := .Get 3 | default "none" -}}
-{{- $resourcebundlepath := path.Join ( .Get 4 | default .Page.Params.defaultResourceBundlePath ) "assets" -}}
 
-
-{{- $resourcebundle := .Site.GetPage $resourcebundlepath -}}
-{{- $metafilename := printf "%s.md" $filebasepath -}}
-{{- $meta := $resourcebundle.Resources.GetMatch $metafilename -}}
-{{- $fullsizelinks:= $.Site.Params.FullSizeLinks | default "false" -}}
+{{- $fullsizelinks := $.Site.Params.FullSizeLinks | default "false" -}}
 
 {{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
 {{- $height := "" -}}
@@ -57,40 +36,74 @@ The assets folder must contain an index.md file of its own with the following fr
     {{- end -}}
 {{- end -}}
 
-{{- $origrelref := "" -}}
-<figure class="image" style="max-width: {{- $width -}}px;">
-    {{- if in $displays "img" -}}
-        {{- $images := where ( $resourcebundle.Resources.Match ( printf "%s.*" $filebasepath )) "MediaType.MainType" "image" -}}
-        {{- range $image := $images -}}
-            {{- $origrelref = $image.RelPermalink -}}
-            {{- if eq $resizeAnchor "none" -}}
-              {{- $resize := printf "%sx%s" $width $height -}}
-              {{- $image = $image.Resize $resize -}}
-            {{- else -}}
-              {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
-              {{- $image = $image.Fill $resize -}}
-            {{- end -}}
-            {{- $alt := "" -}}
-            {{- with $meta -}} {{- $alt = .Params.alt | markdownify -}} {{- end -}}
-               <img src="{{- $image.RelPermalink -}}" width="{{- $image.Width -}}" height="{{- $image.Height -}}" alt="{{- $alt -}} ">
+
+
+{{/* ********************************   */}}
+{{/* METADATA                           */}}
+{{/* ********************************   */}}
+
+{{/* metadata */}}
+{{- $data := index site.Data.assets $shortkey -}}
+
+{{- if not $data -}} 
+    <p><strong>Warning:</strong> No data found for key <code> {{- $shortkey -}} </code></p> 
+{{- end -}}
+
+{{- $metadata := default "" (index $data "metadata") -}}
+{{- $content := default "" (index $data "content") -}}
+
+
+
+{{/* ********************************   */}}
+{{/* IMAGE                              */}}
+{{/* ********************************   */}}
+
+{{/* adjust the image path to be relative to /_index.md bundle within /content (aka "/") */}}
+{{- $fullimgrelref := path.Join $relimgdir (print $shortkey "." (index $data "imgext")) -}}           
+
+{{- if hugo.IsProduction -}}
+    
+    {{ warnf "!!!! PRODUCTION RUN, images will be resized !!!!" }}
+
+    {{- $home := site.Home -}}
+    {{- $image := $home.Resources.Get $fullimgrelref -}}
+    {{- with $image -}}
+
+        {{- if eq $resizeAnchor "none" -}}
+          {{- $resize := printf "%sx%s" $width $height -}}
+          {{- $image = $image.Resize $resize -}}
         {{- else -}}
-            {{- if hugo.IsProduction -}}
-                {{- errorf "No image at %s/%s in %s." $resourcebundlepath $filebasepath .Page.Path -}} 
-            {{- else -}}
-                {{- warnf "No image at %s/%s in %s." $resourcebundlepath $filebasepath .Page.Path -}} 
-                <div style="color: red">
-                    No image at {{- $resourcebundlepath -}}/{{- $filebasepath -}} in {{- .Page.Path -}}
-                </div>
-            {{- end -}}
+          {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
+          {{- $image = $image.Fill $resize -}}
         {{- end -}}
-    {{- end -}}
 
-    {{- if $meta -}}
+        {{- $fullimgrelref = $image.RelPermalink -}}
+        {{- $width = $image.Width -}}
+        {{- $height = $image.Height -}}
+
     {{- else -}}
+        {{- errorf "No image resource at %s in bundle %s" $fullimgrelref .Page.File.Path -}} 
+        {{- errorf "Using shortkey: %s" $shortkey -}} 
     {{- end -}}
 
-    {{- if and $meta (in $displays "blockquote") -}}
-        {{- $quote := $meta.Content -}}
+{{- end -}}
+
+
+
+{{/* ********************************   */}}
+{{/* FIGURE                             */}}
+{{/* ********************************   */}}
+
+<figure class="image" style="max-width: {{- $width -}}px;">
+
+    {{/* IMAGE  */}}
+    {{- if in $displays "img" -}}
+        <img src="{{- $fullimgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" />
+    {{- end -}}
+
+    {{/* CONTENT */}}
+    {{- if and $content (in $displays "blockquote") -}}
+        {{- $quote := $content -}}
         {{- if .Inner -}}
             {{- $quote = .Inner -}}
         {{- end -}}
@@ -99,29 +112,31 @@ The assets folder must contain an index.md file of its own with the following fr
         {{- end -}}
     {{- end -}}
 
+    {{/* CITATION */}}
     {{- if or (in $displays "cite") (in $displays "link") -}}
         <figcaption>
-            {{- if and $meta (in $displays "cite") -}}
-                {{- $.Scratch.Set "params" $meta.Params -}}
-                {{- partial "citation" $ -}}
+            {{- if and $metadata (in $displays "cite") -}}
+                {{- partial "citation" (dict "params" $metadata "ctx" $) -}}
             {{- end -}}
-            {{- if and $origrelref (in $displays "link") -}}
+            {{- if and $fullimgrelref (in $displays "link") -}}
                 {{- if $fullsizelinks -}}
-                    <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+                    <a class="origversion" href="{{- $fullimgrelref -}}">View largest available size.</a>
                 {{- end -}}
             {{- end -}}
         </figcaption>
     {{- end -}}
 
-    {{- if and $meta (in $displays "footer") -}}
-        {{- with $meta.Params.footer -}}
+    {{/* FOOTER */}}
+    {{- if and $metadata (in $displays "footer") -}}
+        {{- with $metadata.footer -}}
             <footer> {{- . | markdownify -}} </footer>
         {{- end -}}
     {{- end -}}
 
-    {{- if and $meta (in $displays "aside") -}}
+    {{/* NOTES */}}
+    {{- if and $metadata (in $displays "aside") -}}
         <aside>
-        {{- with $meta.Params.notes -}}
+        {{- with $metadata.notes -}}
             <div class="notes">{{- . | markdownify -}}</div> 
         {{- end -}}
         </aside>
@@ -129,3 +144,57 @@ The assets folder must contain an index.md file of its own with the following fr
 </figure>
 
 
+{{/*
+
+Version 2
+
+Figure code that uses a JSON encoded pre-compiled asset cache for improved
+performance at scale.
+
+The primary bottle neck in version 1 was file I/O at scale. 
+
+A small Python script at undergo/scripts/compile-assets.py uses the Hugo config
+file to find and recursively walk the asset file hierarchy, compiling metadata 
+for use by the fig shortcode. By leveraging Hugo's built-in data handling 
+capabilities, all asset data in the cache is automaticaly read once at server 
+start-up and is then available instantaneously in memory in the shortcode. 
+
+Furthermore, image manipulation functions in the shortcode are bypassed in 
+the development environment, as in that enviroment, bandwidth is not a 
+bottleneck, and I would prefer to optimize build performance in development 
+instead.
+
+(I started the cache compiling code in Go, both for consisency and performance,
+but found that it was overly complicated for what I wanted to do. There was 
+too much boilerplate, scaffolding, and other environmental dependencies. 
+Python is much more straightforward, and I optimized it at the code level.)
+
+The cache code is run and optimized in the following ways:
+
+  - All scripts in undergo/scripts are added to the PATH by .envrc. 
+  - All code is run from the top level Hugo directory.
+  - All paths are relative to the top level Hugo directory, in other words, 
+    starting with "content/...".
+  - The code is aware of config.toml and retrieves site params from it, as does
+    the fig shortcode. These are explained below.
+  - The code uses Thread Pools for quasi-parallel file I/O.
+  - A parallel index in JSON, with modification times for each key, is also 
+    generated and stored so that the cache can be incrementally updated, 
+    further minimizing file I/O.
+  - Deleting the index file will force a full cache rebuild. (Of course, so 
+    will deleting the cache file itself.)
+  - Incremental updates automatically prune cache entries for files that have
+    been moved or deleted.
+  - A specific record can be updated by passing the --changed flag with a key.
+  - An inotify watcher at undergo/scripts/watch-assets.sh will trigger a
+    --changed call to compile-assets.py automatically whenever a *.md  file is 
+    modified.
+  - The shortcode is designed to be automatically backward compatible to version
+    1 for sites that don't have cache data.
+    
+The inotify watcher may actually be suboptimal with large cache files, because
+Hugo watches the data files themselves while the development server is running
+and reloads the entire cache (and index) file each time it is modified. But Go
+itself is very fast, so I will need to test this at scale.
+
+*/}}

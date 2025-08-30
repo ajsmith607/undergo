@@ -62,8 +62,8 @@
         page-break-inside:avoid
     }
     
-    a[href^=http]:after {
-          content:" <" attr(href) "> ";
+    a[href^="http"]:after {
+          content: " <" attr(href) "> ";
     }
     
     $a:after > img {
@@ -75,7 +75,7 @@
     }
     
     a:not(:local-link):after {
-       content:" <" attr(href) "> ";
+       content: " <" attr(href) "> ";
     }
         
     /**

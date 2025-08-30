@@ -1,0 +1,6 @@
+{{- $svg := .Get 0 -}} 
+{{ with .Page.Resources.GetMatch $svg }}
+    {{  .Content }}
+{{ else }}
+    cannot find file at {{ . }}
+{{ end }}

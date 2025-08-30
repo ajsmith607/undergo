@@ -1,9 +1,4 @@
-
-{{ $params := .params }}
-{{ $ctx := .ctx }}
-{{/* $page := $ctx.Page */}}  {{/* If needed */}}
-
-{{- with $params -}}
+{{- with $.Scratch.Get "params" -}}
     
     {{- $media := .media -}}
     {{- $cite := "" -}}
@@ -31,3 +26,5 @@
     {{- end -}}
 
 {{- end -}}
+
+

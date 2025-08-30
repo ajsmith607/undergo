@@ -149,7 +149,8 @@ img, table, figure, svg, iframe, video {
 img, table, figure, svg, video { height: auto; }
 
 figure { margin: calc( var(--line-height) * 2) 0}
-.cols figure.image { margin: calc( var(--line-height) * 1) 0}
+/* testing .cols figure.image { margin: calc( var(--line-height) * 1) 0} */
+.cols figure { margin: calc( var(--line-height) * 1) 0}
 figure.table { padding-bottom: 0; }
 figure.image img { margin-bottom: 0; }
 figure blockquote, figcaption, figure footer, figure aside, main aside {
@@ -166,8 +167,9 @@ cite { font-style: normal; /* reset of default browser style */  }
 
 pre {
     background-color: var(--background-color2);
-    padding: 0 0 calc( var(--line-height) * 1) calc( var(--line-height) * 1); 
+    padding: calc( var(--line-height) * 1);
 }
+pre, code {white-space: pre-wrap; }
 
 .hero {
     font-size: 4rem; 
@@ -201,7 +203,7 @@ thead tr, tbody tr:nth-child(even) { background-color: var(--background-color2);
 
 dt { font-weight: bold; }
 .meta { display: none; }
-.summary .content p { display: inline; } 
+/* .summary .content p { display: inline; } */ 
 .more-link { margin-left: calc( (var(--line-height) / 2); }
 .hidden { display: none !important; }
 
