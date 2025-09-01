@@ -49,16 +49,18 @@
 {{/* ********************************   */}}
 
 {{/* adjust the image path to be relative to /_index.md bundle within /content (aka "/") */}}
-{{- $fullimgrelref := path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
+{{- $imgrelref := path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
+{{- $origrelref := "" -}}
 
 {{- if hugo.IsProduction -}}
     {{/* in production, use /content/_assets/_index.md as the headless page bundle for production image resources */}}
     
     {{- warnf "!!!! PRODUCTION RUN, images will be resized !!!!" -}}
 
-    {{- $assets := site.GetPage "/_assets" -}}                     {{/* the headless bundle */}}
+    {{- $assets := site.GetPage "/_assets" -}}                     {{/* a headless bundle */}}
     {{- if not $assets -}}{{- errorf "No /_assets bundle visible; check mounts/excludes" -}}{{- end -}}
-    {{- $image := $assets.Resources.Get $fullimgrelref -}}
+    {{- $image := $assets.Resources.Get $imgrelref -}}
+    {{- $origrelref = $image.RelPermalink -}}
     {{- with $image -}}
 
         {{- if eq $resizeAnchor "none" -}}
@@ -69,19 +71,18 @@
           {{- $image = $image.Fill $resize -}}
         {{- end -}}
 
-        {{- $fullimgrelref = $image.RelPermalink -}}
+        {{- $imgrelref = $image.RelPermalink -}}
         {{- $width = $image.Width -}}
         {{- $height = $image.Height -}}
 
     {{- else -}}
-        {{- errorf "No image resource at %s in bundle %s" $fullimgrelref $assets.Path -}} 
-        {{- errorf "Using shortkey: %s" $shortkey -}} 
+        {{- errorf "No image resource at %s in bundle %s" $imgrelref $assets.Path -}} 
     {{- end -}}
 
 {{- else -}}
-    {{/* in development , use full path from site home (/) to statically reference file without resource processing  */}}
-    {{- $fullimgrelref = path.Join "/_assets" $fullimgrelref -}}  {{/* must have leading slash */}}          
-    {{- warnf "IMG $fullimgrelref: %s" $fullimgrelref -}}
+    {{/* in development , use full path from site home (/) to statically reference files without resource processing  */}}
+    {{- $imgrelref = path.Join "/_assets" $imgrelref -}}  {{/* must have leading slash */}}          
+    {{- $origrelref = $imgrelref -}}
 {{- end -}}
 
 
@@ -94,7 +95,7 @@
 
     {{/* IMAGE  */}}
     {{- if in $displays "img" -}}
-        <img src="{{- $fullimgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" />
+        <img src="{{- $imgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" />
     {{- end -}}
 
     {{/* CONTENT */}}
@@ -114,9 +115,9 @@
             {{- if and $metadata (in $displays "cite") -}}
                 {{- partial "citation" (dict "params" $metadata "ctx" $) -}}
             {{- end -}}
-            {{- if and $fullimgrelref (in $displays "link") -}}
+            {{- if and $imgrelref (in $displays "link") -}}
                 {{- if $fullsizelinks -}}
-                    <a class="origversion" href="{{- $fullimgrelref -}}">View largest available size.</a>
+                    <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
                 {{- end -}}
             {{- end -}}
         </figcaption>
@@ -142,18 +143,19 @@
 
 {{/*
 
-Version 2
+Fig Version 2
 
 Figure code that uses a JSON encoded pre-compiled asset cache for improved
 performance at scale.
 
-The primary bottle neck in version 1 was file I/O at scale. 
+The primary bottle neck in version 1 was file I/O at scale, and publishing
+resources unnecessarily, generating much more HTML/XML than needed. 
 
-A small Python script at undergo/scripts/compile-assets.py uses the Hugo config
-file to find and recursively walk the asset file hierarchy, compiling metadata 
-for use by the fig shortcode. By leveraging Hugo's built-in data handling 
-capabilities, all asset data in the cache is automaticaly read once at server 
-start-up and is then available instantaneously in memory in the shortcode. 
+A small Python script at undergo/scripts/compile-assets.py recursively walks
+the asset file hierarchy, compiling metadata for use by the fig shortcode. By 
+leveraging Hugo's built-in data handling capabilities, all asset data in the 
+cache is automaticaly read once at server start-up and is then available 
+instantaneously in memory in the shortcode. 
 
 Furthermore, image manipulation functions in the shortcode are bypassed in 
 the development environment, as in that enviroment, bandwidth is not a 
@@ -169,14 +171,13 @@ The cache code is run and optimized in the following ways:
 
   - All scripts in undergo/scripts are added to the PATH by .envrc. 
   - All code is run from the top level Hugo directory.
-  - All paths are relative to the top level Hugo directory, in other words, 
+  - Paths are relative to the top level Hugo directory, in other words, 
     starting with "content/...".
-  - The code is aware of config.toml and retrieves site params from it, as does
-    the fig shortcode. These are explained below.
   - The code uses Thread Pools for quasi-parallel file I/O.
   - A parallel index in JSON, with modification times for each key, is also 
     generated and stored so that the cache can be incrementally updated, 
-    further minimizing file I/O.
+    further minimizing file I/O. This index is above /data so Hugo doesn't 
+    ingest it when building.
   - Deleting the index file will force a full cache rebuild. (Of course, so 
     will deleting the cache file itself.)
   - Incremental updates automatically prune cache entries for files that have
@@ -185,12 +186,93 @@ The cache code is run and optimized in the following ways:
   - An inotify watcher at undergo/scripts/watch-assets.sh will trigger a
     --changed call to compile-assets.py automatically whenever a *.md  file is 
     modified.
-  - The shortcode is designed to be automatically backward compatible to version
-    1 for sites that don't have cache data.
-    
-The inotify watcher may actually be suboptimal with large cache files, because
-Hugo watches the data files themselves while the development server is running
-and reloads the entire cache (and index) file each time it is modified. But Go
-itself is very fast, so I will need to test this at scale.
+   
+The fig shorcode was updated to use this cache and to be more clearly 
+organized and performance optimized overall. For example, file globbing used
+in version 1 has been replaced with explicit paths in version 2.
+
+Configuration for undergo module and production build optimizations:
+
+# theming and reusable code
+[module]
+  _merge = "deep"
+  [[module.imports]]
+    path = "github.com/ajsmith607/undergo"
+
+  # don't render pages for *.md files under /content/_assets
+  [[module.mounts]]
+    source = "content"
+    target = "content"
+    excludeFiles = ["/_assets/**/*.md"]    # path is relative to /content
+    # re-add only the section's _index.md so its front matter applies
+    # and it can be referenced as the images resource bundle in fig production shortcode
+  [[module.mounts]]
+    source = "content/_assets/_index.md"
+    target = "content/_assets/_index.md"
+
+The content of /content/_assets/_index.md is:
+
+---
+# Controls the section node itself
+headless: true
+outputs: []
+build:
+  list: never
+  render: never
+  publishResources: true    # in order to see the images at all 
+
+# Push the same rules to all descendants
+cascade:
+  _target:
+    path: "/_assets/**"    # children of this section
+  outputs: []
+  build:
+    list: never
+    render: never
+    publishResources: true
+---
+
+The development environment is further optimized by shutting down all 
+unneccessary output, and moving _assets to /static, thus avoiding all resource
+publishing and I/O while keeping paths consistent, so no special code is 
+needed to handle this, the shortcode works automatically in each case. 
+Images are not resized and therefore are not optimized themselves,  but in 
+developement, data is served locally, so bandwith is not an issue.
+
+# --- development overrides ---
+[environments.development]
+disableKinds = ["RSS", "sitemap", "robotsTXT", "taxonomy", "term"]
+resourceDir = "/dev/shm/hugo-resources"
+
+  [environments.development.module]
+    # Dev: mount everything except _assets as content
+    [[environments.development.module.mounts]]
+      source = "content"
+      target = "content"
+      excludeFiles = ["/_assets/**"]
+
+    # Dev: serve _assets raw as static files, limit to images
+    [[environments.development.module.mounts]]
+      source = "content/_assets"
+      target = "static/_assets"
+      includeFiles = ["**/*.jpg","**/*.jpeg","**/*.png","**/*.webp","**/*.gif"]
+
+In production, images must be under /content, not /static or /resources. 
+The images must be treated as resources for dynamic scaling (which can't be 
+done in /static, but must also be visible so the full original can be seen when 
+anyone clicks "view largest available image" (which can't be done in 
+/resources). By convention, _assets is directly under /content to be available
+sitewide, and is named with a leading underscore to avoid name collisions.
+
+To summarize:
+  - In production, images under _assets are treated as resources under /content.
+  - In development, images under _assets are treated statically under /static.
+
+Typically, run development hugo server in fast render mode with no http 
+caching, as most edits in that environment are one content page at a time.
+
+For more information on why images must be under content, see the code comments
+in version 1 of the fig shortcode: figv1.html.
+
 
 */}}
