@@ -1,5 +1,5 @@
 
-This is my personal custom Hugo base theme implemented as a Hugo module. 
+A custom Hugo base theme implemented as a Hugo module. 
 
 My basic approach to creating this theme:
 
