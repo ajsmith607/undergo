@@ -135,3 +135,41 @@ The assets folder must contain an index.md file of its own with the following fr
 </figure>
 
 
+
+{{/* 
+
+The goals of the site are fundamentally at odds with the Hugo content model, which I needed to bend with the setup described above :
+  - Each image has an associated .md file with:
+      - markdown formatted metadata in YAML front matter, and 
+      - transcriptions as markdown content.
+    ... that is to say, these files are not content pages but 
+  - For logical file maintenance, I want to keep the image and metadata files together, with the same basename.
+  - Images must be treated as resources to give access to image manipulation functions.
+  - I want to leverage Hugo's built-in ability to parse markdown files with front matter, meaning they must be treated as resources. But doing so means that Hugo must treat each of these markdown files as Page objects. (Maybe that's OK?)
+
+Moving assets directory above content directory will stop pages being generated for each .md file, but then you lose the ability to treat .md files as resources. Also, this would seem to make the "view largest available size" option unavailable without additional work.
+
+Also understand these differences in Hugo:
+
+_index.md = defines SECTIONS (section landing page)
+  - can only define cascading properties in these files and apply to descendant cotent pages
+  - treated as a rendered page
+  - each .md file in subcontent is rendered as page
+  - .md files CANNOT be treated as resources (unless there is no front matter?); they are treated as child pages.
+  - therefore cannot be used to group related files one resource bundle
+
+index.md = defines SINGLE pages ("leaf bundle")
+  - CANNOT define cascading properties or have cascading properties applied 
+  - treated as a rendered page
+  - .md files in subcontent are not rendered as pages, they are resources (TRUE?)
+  - can be used to group related files in one resource bundle
+
+You cannot define both _index.md and index.md in the same folder.
+
+In summary, the following approaches have not worked:
+  - storing assets above content (in SITE_ROOT/assets), not able to treat .md files as resources or even as markdown internally, no automatic public access to original image without additional workaround
+  - treating assets as sections with cascading properties (under _index.md), fundamentally incompatible for the reasons given above
+  - defnining headless: true in the front matter of all .md files appears to have no impact, Hugo needs to treat these as Pages, even if the content is not rendered. (maybe not, after cache implementation) 
+
+
+*/}}

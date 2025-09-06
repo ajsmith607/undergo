@@ -5,7 +5,6 @@
 
 # usage:
 # add undergo/scripts to .envrc
-# add assetDir setting in config.toml
 # $ python3 compile-assets.py
 
 import frontmatter
@@ -19,10 +18,12 @@ from itertools import repeat
 
 
 asset_path = Path("content/_assets/images")
-output = Path("./data/assets.json")
-index = Path("./assets_index.json")
-threads = 4
+cache = Path("data/assets.json")
+index = Path("assets_index.json")
+figcode = Path("figstoadd.txt")
 
+
+threads = 4
 
 # -----------------------------
 # Read config.toml and extract indicated value 
@@ -86,7 +87,6 @@ def process_file(md_path):
         print(f"NO IMAGE FOR - {str(md_path)}")
         return ("", None)  # or some sentinel key
         
-
     post = frontmatter.load(md_path)
     data = {
         "imgext":     imgext,
@@ -96,19 +96,17 @@ def process_file(md_path):
 
     return key, data
 
-
 # -----------------------------
 # Main function
 # -----------------------------
 def main():
     parser = ArgumentParser(description="Cache Hugo markdown files with frontmatter into JSON.")
     # parser.add_argument("site_dir", type=Path, help="Path to Hugo site root (must contain config.toml)")
-    # parser.add_argument("--output", type=Path, default="cached_content.json", help="Path to write JSON cache")
+    # parser.add_argument("--cache", type=Path, default="cached_content.json", help="Path to write JSON cache")
     # parser.add_argument("--index", type=Path, default="cache_index.json", help="Path to write incremental index")
     # parser.add_argument("--threads", type=int, default=4, help="Number of threads for parallel processing")
     parser.add_argument("--changed", type=Path, help="Optional: only re-process this file")
     args = parser.parse_args()
-
 
     #config_path = Path("config.toml") 
     #print(f"Configuration file used (config_path): {str(config_path)}")
@@ -119,8 +117,8 @@ def main():
 
     # Load previous full cache if it exists (as dict)
     full_cache = {}
-    if output.exists():
-        with output.open() as f:
+    if cache.exists():
+        with cache.open() as f:
             full_cache = json.load(f)
 
     # prune entries for moved or deleted files 
@@ -141,7 +139,11 @@ def main():
         if key in valid_keys
     }
 
+    full_rebuild = False
     prev_index = load_json(index)
+    if prev_index == {}:
+        full_rebuild = True
+        print(f"🗑️ Full index rebuild")
 
     # collect updates
     if args.changed:    # Targeted update
@@ -165,23 +167,39 @@ def main():
 
     else:
 
-        print(f"Beginning full scan")
+        print("🗑️ Beginning full scan")
         new_index = {}
         files_to_process = []
 
+        new_keys = []       # keys newly added (not present in prev_index)
+        modified_keys = []  # keys present but with changed mtime
+        unchanged_keys = [] # optional
+
         for md_file in asset_path.rglob("*.md"):
             key = getkey(md_file)
-            mtime = str(os.path.getmtime(md_file))
+            mtime = os.stat(md_file).st_mtime_ns  # use ns precision for stable compares
             new_index[key] = mtime
-            prev_mtime = prev_index.get(key)
-            if prev_mtime != mtime:
-                files_to_process.append(md_file)
 
+            prev_mtime = prev_index.get(key)
+            if prev_mtime is None:
+                new_keys.append(key)
+                files_to_process.append(md_file)
+            elif prev_mtime != mtime:
+                modified_keys.append(key)
+                files_to_process.append(md_file)
+            else:
+                unchanged_keys.append(key)
 
     if files_to_process:
-        print("🗑️ Updating modified entries:")
-        for update in files_to_process:
-            print(f" - {update}")
+        if new_keys:
+            print("🗑️ Adding new entries:")
+            for new in new_keys:
+                print(f" - {new}")
+
+        if modified_keys:
+            print("🗑️ Updating modified entries:")
+            for update in modified_keys:
+                print(f" - {update}")
 
         with ThreadPoolExecutor(max_workers=threads) as executor:
             results = list(executor.map(process_file, files_to_process))
@@ -190,19 +208,24 @@ def main():
         # updated = {key: entry for (key, entry) in results}
         updated = {key: entry for key, entry in results if key}
         full_cache.update(updated)
+
+        # Write the full merged cache
+        with cache.open("w") as f:
+            json.dump(full_cache, f, indent=2)
+        print(f"✅ Cache written to {cache}")
+
+        # Always update the index
+        with index.open("w") as f:
+            json.dump(new_index, f, indent=2)
+        print(f"📁 Index updated at {index}")
+
+        if new_keys and not full_rebuild:
+            with figcode.open("w") as f:
+                for newkey in new_keys:
+                    f.write(f"{{{{< fig \"{newkey}\" width=\"800\" >}}}}\n")
+            print(f"📁 Output fig code at {figcode}")
     else:
         print("No files to process")
-
-
-    # Write the full merged cache
-    with output.open("w") as f:
-        json.dump(full_cache, f, indent=2)
-    print(f"✅ Cache written to {output}")
-
-    # Always update the index
-    with index.open("w") as f:
-        json.dump(new_index, f, indent=2)
-    print(f"📁 Index updated at {index}")
 
 # -----------------------------
 if __name__ == "__main__":

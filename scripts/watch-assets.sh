@@ -2,12 +2,9 @@
 
 # Path to Hugo site root (assumed to be the current dir, or passed as $1)
 SITE_DIR="${1:-.}"
-CONFIG_FILE="$SITE_DIR/config.toml"
 PYTHON_SCRIPT="compile-assets.sh"
 
-# Parse contentDir from config.toml (default to 'content')
-ASSET_DIR=$(awk -F '=' '/^assetDir/ {gsub(/[[:space:]"'\'']/, "", $2); print $2}' "$CONFIG_FILE")
-ASSET_DIR="${ASSET_DIR:-content/assets}"  # fallback if not set
+ASSET_DIR="${ASSET_DIR:-content/_assets}"  # fallback if not set
 WATCH_PATH="$SITE_DIR/$ASSET_DIR"
 
 echo "📂 Watching directory: $WATCH_PATH"

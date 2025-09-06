@@ -4,7 +4,10 @@ Figure code that uses a JSON encoded pre-compiled asset cache for improved
 performance at scale.
 
 The primary bottle neck in version 1 was file I/O at scale, and publishing
-resources unnecessarily, generating much more HTML/XML than needed. 
+resources unnecessarily, generating much more HTML/XML than needed. This made
+site rebuilds in development take so long that it impacted writing 
+productivity. (See _figv1.backup comments for a fuller discussion of the 
+underlying mismatch and  tradeoffs.)
 
 A small Python script at undergo/scripts/compile-assets.py recursively walks
 the asset file hierarchy, compiling metadata for use by the fig shortcode. By 
@@ -50,6 +53,7 @@ Obviously before both dev and prod builds, this cache must be refreshed.
 
 Configuration for undergo module and production build optimizations:
 
+
 # theming and reusable code
 [module]
   _merge = "deep"
@@ -67,7 +71,9 @@ Configuration for undergo module and production build optimizations:
     source = "content/_assets/_index.md"
     target = "content/_assets/_index.md"
 
+
 The content of /content/_assets/_index.md is:
+
 
 ---
 # Controls the section node itself
@@ -89,12 +95,14 @@ cascade:
     publishResources: true
 ---
 
+
 The development environment is further optimized by shutting down all 
 unnecessary output, and moving _assets to /static, thus avoiding all resource
 publishing and I/O while keeping paths consistent, so no special code is 
 needed to handle this, the shortcode works automatically in each case. 
 Images are not resized and therefore are not optimized themselves,  but in 
 developement, data is served locally, so bandwith is not an issue.
+
 
 # --- development overrides ---
 [environments.development]
@@ -114,6 +122,7 @@ resourceDir = "/dev/shm/hugo-resources"
       target = "static/_assets"
       includeFiles = ["**/*.jpg","**/*.jpeg","**/*.png","**/*.webp","**/*.gif"]
 
+
 In production, images must be under /content, not /static or /resources. 
 The images must be treated as resources for dynamic scaling (which can't be 
 done in /static, but must also be visible so the full original can be seen when 
@@ -131,3 +140,24 @@ caching, as most edits in that environment are one content page at a time.
 For more information on why images must be under content, see the code comments
 in version 1 of the fig shortcode: figv1.html.
 
+On incremental index buildes, the compile-assets.py script outputs basic fig 
+shortcodes for new records to a file in the top level Hugo directory called 
+figstoadd.txt. The following code triggers compile-assets from within Vi and 
+automatically pastes the generated fig shortcodes for new files below the cursor
+in the active buffer. The buffer is also automatically saved, meaning that not 
+only will Hugo automatically load the asset cache when it sees it was updated, 
+but navigatetochanged will be automatically triggered, meaning that when new 
+assets are added to the cache, they will be displayed automatically in the 
+browser.
+
+
+" <F2>: execute a bash script compile-assets.sh in PATH, 
+"       then read file stored in the shell PWD into buffer cursor location, 
+"       then write buffer
+"  — capture launch dir once, run script there, then read+write the file
+if !exists('g:startdir') | let g:startdir = expand('$PWD') | endif
+nnoremap <silent> <F2> :execute '! (cd ' . shellescape(g:startdir) . ' && compile-assets.sh)' <Bar> execute 'read ' . fnameescape(g:startdir . '/figstoadd.txt') <Bar> write<CR>
+
+
+For the paths to work, Vi should be invoked from the top level Hugo directory. 
+(Just default to doing everything from there.)
