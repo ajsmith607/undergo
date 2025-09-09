@@ -221,8 +221,9 @@ def main():
 
         if new_keys and not full_rebuild:
             with figcode.open("w") as f:
-                for newkey in new_keys:
-                    f.write(f"{{{{< fig \"{newkey}\" width=\"800\" >}}}}\n")
+                f.write(f"{{{{/* {{{{< fig \"path/basename\" \"widthxheight\" \"img,blockquote,cite,link,footer,aside\" \"top\" />}}}} */}}}} (also: innersytle overrides content) \n")
+                for newkey in new_keys:   
+                    f.write(f"{{{{< fig \"{newkey}\" \"800\" >}}}}\n")
             print(f"📁 Output fig code at {figcode}")
     else:
         print("No files to process")

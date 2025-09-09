@@ -4,16 +4,22 @@
 {{/* PARAMS                             */}}
 {{/* ********************************   */}}
 
-{{- $shortkey := .Get 0 -}}           
-{{- $size := .Get 1 -}} 
-    {{/* size can be just width as unitless integer (like "800")
-         or as two integers separated by an x to indicate complete dimensions
-         (like "400x200") */}}
-{{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
-{{- $resizeAnchor := .Get 3 | default "none" -}}
-
 {{- $fullsizelinks := $.Site.Params.FullSizeLinks | default "false" -}}
 
+
+{{/* 0: SHORTKEY 
+shortkey is the path relative to /content/_assets/images/, 
+with no leading slash and only the basename, no file extension. 
+Ex.: "topfolder/firstasset" is the shortkey for the asset described with /content/_assets/images/topfolder/firstasset.md
+*/}}
+{{- $shortkey := .Get 0 -}}           
+
+
+{{/* 1: SIZE
+size can be just width as unitless integer (like "800")
+or as two integers separated by an x to indicate complete dimensions (like "400x200") 
+*/}}
+{{- $size := .Get 1 -}} 
 {{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
 {{- $height := "" -}}
 {{- with $size -}}
@@ -25,6 +31,27 @@
         {{- $width = . -}}
     {{- end -}}
 {{- end -}}
+
+
+{{/* 2: DISPLAYS 
+displays can be any combination of string values: img,blockquote,cite,link,footer,aside
+if none are specified, defaults to all
+*/}}
+{{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
+
+
+{{/* 3: RESIZEANCHOR 
+DEPRECATED, likely to be phased out as unnecessary, 
+because of the responsive layout approach taken: 
+  - if only a width is specified, a resize is done with dynamic height, 
+    and an anchor is not needed
+  - if height is also specified, a proportional crop is done, 
+    and the anchor is logically always top 
+only relevant for staging/production site generation
+*/}}
+{{- $resizeAnchor := .Get 3 | default "none" -}}
+{{- if $height -}} {{- $resizeAnchor = "top" -}} {{- end -}}
+
 
 
 
@@ -44,13 +71,22 @@
 
 
 
+
 {{/* ********************************   */}}
 {{/* IMAGE                              */}}
 {{/* ********************************   */}}
 
 {{/* adjust the image path to be relative to /_index.md bundle within /content (aka "/") */}}
 {{- $imgrelref := path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
-{{- $origrelref := "" -}}
+{{- $origrelref := $imgrelref -}}
+
+{{/* 
+the following styles are used in development mode to statically mimic hugo asset processing (image cropping) 
+ensuring that development is truly WYSIWYG while optimizing developmemt performance
+*/}}
+
+{{- $cropwrapperstyle := "" -}} 
+{{- $cropimgstyle := "" -}} 
 
 {{- if hugo.IsProduction -}}
     {{/* in production, use /content/_assets/_index.md as the headless page bundle for production image resources */}}
@@ -64,9 +100,11 @@
     {{- with $image -}}
 
         {{- if eq $resizeAnchor "none" -}}
+          {{/* scale */}}
           {{- $resize := printf "%sx%s" $width $height -}}
           {{- $image = $image.Resize $resize -}}
         {{- else -}}
+          {{/* crop */}}
           {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
           {{- $image = $image.Fill $resize -}}
         {{- end -}}
@@ -82,8 +120,14 @@
 {{- else -}}
     {{/* in development , use full path from site home (/) to statically reference files without resource processing  */}}
     {{- $imgrelref = path.Join "/_assets" $imgrelref -}}  {{/* must have leading slash */}}          
-    {{- $origrelref = $imgrelref -}}
+
+    {{/* statically mimic asset cropping, %v for type safety */}}
+    {{- if $resizeAnchor -}} 
+        {{- $cropwrapperstyle = printf "width:%vpx; height:%vpx; overflow:hidden; display:flex; align-items:self-start;" $width $height | safeCSS -}} 
+        {{- $cropimgstyle = "flex:0 0 auto" | safeCSS -}} 
+    {{- end -}}
 {{- end -}}
+
 
 
 
@@ -95,8 +139,11 @@
 
     {{/* IMAGE  */}}
     {{- if in $displays "img" -}}
-        <img src="{{- $imgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" />
+    <div {{ with $cropwrapperstyle }} style="{{- . -}}" {{ end }}> {{/* with block using '-' style doesn't preserve spacing */}}
+        <img src="{{- $imgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" {{- with $cropimgstyle -}} style="{{- . -}}" {{- end -}} />
+    </div>
     {{- end -}}
+
 
     {{/* CONTENT */}}
     {{- if and $content (in $displays "blockquote") -}}
@@ -108,6 +155,7 @@
             <blockquote>{{- . | markdownify  -}}</blockquote>
         {{- end -}}
     {{- end -}}
+
 
     {{/* CITATION */}}
     {{- if or (in $displays "cite") (in $displays "link") -}}
@@ -123,12 +171,14 @@
         </figcaption>
     {{- end -}}
 
+
     {{/* FOOTER */}}
     {{- if and $metadata (in $displays "footer") -}}
         {{- with $metadata.footer -}}
             <footer> {{- . | markdownify -}} </footer>
         {{- end -}}
     {{- end -}}
+
 
     {{/* NOTES */}}
     {{- if and $metadata (in $displays "aside") -}}

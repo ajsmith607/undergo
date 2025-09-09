@@ -138,9 +138,10 @@ Typically, run development hugo server in fast render mode with no http
 caching, as most edits in that environment are one content page at a time.
 
 For more information on why images must be under content, see the code comments
-in version 1 of the fig shortcode: figv1.html.
+in version 1 of the fig shortcode: figv1.html. Inline comments in 
+layouts/shortcodes/fig.html explains usage and shortcode implementation details.
 
-On incremental index buildes, the compile-assets.py script outputs basic fig 
+On incremental index builds, the compile-assets.py script outputs basic fig 
 shortcodes for new records to a file in the top level Hugo directory called 
 figstoadd.txt. The following code triggers compile-assets from within Vi and 
 automatically pastes the generated fig shortcodes for new files below the cursor
