@@ -162,3 +162,10 @@ nnoremap <silent> <F2> :execute '! (cd ' . shellescape(g:startdir) . ' && compil
 
 For the paths to work, Vi should be invoked from the top level Hugo directory. 
 (Just default to doing everything from there.)
+
+The fig shortcode was further optizimized by leaving all pararmeter handling,
+(treating shortcode like a controller) and calling cached partial to render
+fig html and cache the results so it only renders once.
+
+
+

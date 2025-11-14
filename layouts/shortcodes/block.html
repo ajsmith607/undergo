@@ -1,0 +1,25 @@
+{{/*
+block shortcode
+Usage similar to pagelink and fig:
+
+(similar to fig and other shortcodes, drop the .md extension)
+{{< include-block "section/intro" >}} -> renders /content/_assets/blocks/section/intro.md
+
+Can also explicitly reference.html files properly
+{{< include-block "section/intro.html" >}} -> renders /content/_assets/blocks/section/intro.html
+*/}}
+
+{{ $file := .Get 0 }}
+{{ $file = cond (hasSuffix $file ".md") $file (printf "%s.md" $file) }}
+{{ $path := print "blocks/" $file }}  {{/* referencing as a hugo resource */}}
+
+{{ if hugo.IsServer }}
+    {{ partial "block-render" (dict "page" .Page "file" $file "path" $path) }}
+{{ else }}
+    {{ partialCached "block-render" (dict "page" .Page "file" $file "path" $path) $path }}
+{{ end }}
+
+
+
+
+

@@ -1,0 +1,32 @@
+
+{{/* Rendered block partial used by block shortcode */}}
+{{ $page := .page }}
+{{ $file := .file }}
+{{ $path := .path }}
+
+{{ $block := resources.Get $path }}
+
+{{ with $block }}
+
+    {{ $content := $block.Content }}
+    {{ $rendered := $page.RenderString $content }}
+
+    {{ if hugo.IsServer }}
+    <div style="width: 100%;border:1px dashed gray;padding:0;margin:0;">
+      <small style="display:block;font-size:0.75em;color:gray;">
+        ⚙️ {{ $file }} (from /content/_assets/blocks/)
+      </small>
+      {{ $rendered | safeHTML }}
+      <small style="display:block;font-size:0.75em;color:gray;">
+        ⚙️ {{ $file }} (from /content/_assets/blocks/)
+      </small>
+    </div>
+    {{ else }}
+        {{ $rendered | safeHTML }}
+    {{ end }}
+
+{{ else }}
+    {{ errorf "No block resource at %s" $path }}
+{{ end }}
+
+

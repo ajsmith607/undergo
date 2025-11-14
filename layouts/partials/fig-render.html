@@ -1,0 +1,174 @@
+
+{{ $shortkey := .shortkey }}
+{{ $width := .width }}
+{{ $height := .height }}
+{{ $displays := .displays }}
+{{ $resizeAnchor := .resizeAnchor }}
+{{ $fullsizelinks := .fullsizelinks }}
+{{ $inner := .inner }}
+{{ $page := .page }}
+
+
+
+
+{{/* ********************************   */}}
+{{/* METADATA                           */}}
+{{/* ********************************   */}}
+
+{{/* metadata */}}
+{{- $data := index site.Data.assets $shortkey -}}
+
+{{- if not $data -}} 
+    <p><strong>Warning:</strong> No data found for key <code> {{- $shortkey -}} </code></p> 
+{{- end -}}
+
+{{- $metadata := default "" (index $data "metadata") -}}
+{{- $content := default "" (index $data "content") -}}
+
+
+
+
+{{/* ********************************   */}}
+{{/* IMAGE                              */}}
+{{/* ********************************   */}}
+
+{{- $imgrelref := print $shortkey "." (index $data "imgext") -}}           
+{{- $origrelref := $imgrelref -}}
+
+{{/* 
+the following styles are used in development mode to statically mimic hugo asset processing (image cropping) 
+ensuring that development is truly WYSIWYG while optimizing developmemt performance
+*/}}
+{{- $cropwrapperstyle := "" -}} 
+{{- $cropimgstyle := "" -}} 
+
+{{- $static := false -}}
+{{- if hugo.IsServer -}}
+    {{- $static = true -}}
+{{- end -}}
+
+{{- if $static -}}
+    {{- $imgrelref = path.Join "/_assets/images" (print $shortkey "." (index $data "imgext")) -}}  {{/* must have leading slash */}}          
+
+    {{ $clean := strings.TrimPrefix "/" $imgrelref }}
+    {{ $fs := path.Join "content" $clean }}
+    {{ if not (fileExists $fs) }}
+        {{ warnf "STATIC IMAGE MISSING: %s" $fs }}
+    {{ end }}
+
+    {{- $origrelref = $imgrelref -}}
+    {{/* statically mimic asset cropping, %v for type safety */}}
+    {{- if $resizeAnchor -}} 
+        {{ $height = "auto" }}
+        {{- $cropwrapperstyle = printf "width:%vpx; height:%s; overflow:hidden; display:flex; align-items:self-start; margin:0; padding:0;" $width $height | safeCSS -}} 
+        {{- $cropimgstyle = "flex:0 0 auto" | safeCSS -}} 
+    {{- end -}}
+
+{{- else -}}
+
+    {{- $image := resources.Get $imgrelref -}}
+    {{- with $image -}}
+
+        {{- $imgrelref = path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
+        {{- $origrelref = $image.RelPermalink -}}
+
+        {{- if eq $resizeAnchor "none" -}}
+          {{/* scale */}}
+          {{- $resize := printf "%sx%s" $width $height -}}
+          {{- $image = $image.Resize $resize -}}
+        {{- else -}}
+          {{/* crop */}}
+          {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
+          {{- $image = $image.Fill $resize -}}
+        {{- end -}}
+
+        {{- $imgrelref = $image.RelPermalink -}}
+        {{- $width = $image.Width -}}
+        {{- $height = $image.Height -}}
+
+    {{- else -}}
+        {{- errorf "No image resource at %s" $imgrelref -}} 
+    {{- end -}}
+
+{{- end -}}
+
+
+<figure class="image" style="width: {{- $width -}}px; max-width: {{- $width -}}px;">
+
+  {{/* IMAGE */}}
+  {{- if in $displays "img" -}}
+      {{- with $cropwrapperstyle -}}<div style="{{- . -}}">{{- end -}}
+      <img src="{{- $imgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" {{- with $cropimgstyle -}}style="{{- . -}}"{{- end -}} />
+      {{- with $cropwrapperstyle -}}</div>{{- end -}}
+  {{- end -}}
+
+  {{/* CONTENT */}}
+  {{- if and $content (in $displays "blockquote") -}}
+    {{- $quote := $content -}}
+    {{- if $inner -}}
+      {{- $quote = $inner -}}
+    {{- end -}}
+    {{- with $quote -}}
+      <blockquote>{{- . | markdownify -}}</blockquote>
+    {{- end -}}
+  {{- end -}}
+
+  {{/* CITATION */}}
+  {{- if or (in $displays "cite") (in $displays "link") -}}
+    <figcaption>
+    {{- if and $metadata (in $displays "cite") -}}
+
+        {{- with $metadata -}}
+            
+            {{- $media := .media -}}
+            {{- $cite := "" -}}
+            {{- with .citation -}}
+                {{/* normalizing how ending periods are handled */}} 
+                {{/* removing temporarily if it is found */}} 
+                {{- $cite = replaceRE "\\.[\\s]*$" "" . -}}
+            {{- else -}}
+                {{- $c := slice }}
+                {{- with .pubdate -}} {{- $c = $c | append (time.Format "02 Jan 2006" .) -}} {{- end -}}
+                {{- with .author -}} {{- $c = $c | append (print '"' . '"') -}} {{- end -}}
+                {{- with .title -}} {{- $c = $c | append . -}} {{- end -}}
+                {{- with .voltitle -}} {{- $c = $c | append . -}} {{- end -}}
+                {{- with .publocation -}} {{- $c = $c | append . -}} {{- end -}}
+                {{- with .pages -}} {{- $c = $c | append (print "p" .) -}} {{- end -}}
+                {{- with .source -}} {{- $c = $c | append . -}} {{- end -}}
+                {{- $cite = delimit $c ", " -}}
+            {{- end -}}
+
+            {{- with $cite -}}
+                {{/* normalizing how ending periods are handled */}} 
+                {{/* adding closing period */}} 
+        — <cite>{{- . | markdownify -}}. </cite> 
+                {{- with $media -}} <span class="media">{{- . | markdownify -}}</span> {{- end -}}
+            {{- end -}}
+
+        {{- end -}}
+
+      {{- end -}}
+      {{- if and $imgrelref (in $displays "link") -}}
+        {{- if $fullsizelinks -}}
+          <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+        {{- end -}}
+      {{- end -}}
+    </figcaption>
+  {{- end -}}
+
+  {{/* FOOTER */}}
+  {{- if and $metadata (in $displays "footer") -}}
+    {{- with $metadata.footer -}}
+      <footer>{{- . | markdownify -}}</footer>
+    {{- end -}}
+  {{- end -}}
+
+  {{/* NOTES */}}
+  {{- if and $metadata (in $displays "aside") -}}
+    <aside>
+      {{- with $metadata.notes -}}
+        <div class="notes">{{- . | markdownify -}}</div>
+      {{- end -}}
+    </aside>
+  {{- end -}}
+</figure>

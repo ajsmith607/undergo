@@ -37,11 +37,13 @@ html, body {
     font-family: var(--font-family);
     font-size: var(--font-size);
     line-height: var(--line-height-unitless); 
+    width: 100%;
 }
 
 header, main, aside, footer {
     margin: 0 auto 0 var(--left-margin);
-    padding: 0 calc( var(--line-height) / 2);
+    padding: 0;     
+    width: var(--max-width);
     max-width: var(--max-width);
 }
 
@@ -166,11 +168,43 @@ figure ul, figure ol { padding-left: calc( var(--line-height) * 1); }
 cite { font-style: normal; /* reset of default browser style */  }
 .quote-only { margin-bottom: calc( var(--line-height) * 2); }
 
+
+/* --- Ensure figure and its table behave as full-width blocks --- */
+/* 
+       As of Hugo 0.150, a change in Goldmark's rendering broke table displays
+       (likely through subtle differences in block boundary handling), 
+       and the browser dropped into “shrink-to-fit” mode for the table. 
+       Explicitly reasserting display:block and width:100% on both <figure> 
+       and its child <table>, forces it back into normal block flow.
+*/
+
+figure.table {
+  display: block;              /* not inline-table, not inline-block */
+  width: 100%;
+  margin: 1em 0;               /* optional */
+  padding: 0;
+}
+
+figure.table > table {
+  display: table;              /* restore normal table model */
+  width: 100%;                 /* occupy full available width */
+  table-layout: auto;          /* keep natural cell sizing */
+  border-collapse: collapse;
+}
+
+figure.table > figcaption {
+  display: block;
+  width: 100%;
+}
+/* --- Ensure figure and its table behave as full-width blocks --- */
+
 pre {
     background-color: var(--background-color2);
     padding: calc( var(--line-height) * 1);
 }
 pre, code {white-space: pre-wrap; }
+
+article .summary a.more-link { display: none; color: var(--color); }
 
 .hero {
     font-size: 4rem; 
@@ -185,15 +219,29 @@ figcaption, figure.image blockquote, figure footer, figure aside {
     vertical-align: top;
 }
 
-article .summary a.more-link { display: none; color: var(--color); }
-
 table { 
     width: 100%;
+    table-layout: auto;
     margin-top: calc( var(--line-height) * 1); 
     border-collapse: collapse;
     border-top: 1px solid var(--border-color); 
     border-bottom: 1px solid var(--border-color); 
 }
+table, table * {
+  white-space: normal;   /* allow wrapping, not nowrap */
+  font-size: inherit;    /* avoid collapsed text width */
+}
+table tbody { display: table-row-group; }
+table tr {
+  display: table-row;
+  border-spacing: 0;
+  border-collapse: collapse;
+}
+table td, table th {
+  display: table-cell;
+  vertical-align: top;
+}
+
 th { font-weight: bold; }
 th, td { 
     line-height: var(--line-height);

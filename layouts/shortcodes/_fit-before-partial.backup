@@ -1,0 +1,195 @@
+
+
+{{/* ********************************   */}}
+{{/* PARAMS                             */}}
+{{/* ********************************   */}}
+
+{{- $fullsizelinks := $.Site.Params.FullSizeLinks | default "false" -}}
+
+
+{{/* 0: SHORTKEY 
+shortkey is the path relative to /content/_assets/images/, 
+with no leading slash and only the basename, no file extension. 
+Ex.: "topfolder/firstasset" is the shortkey for the asset described with /content/_assets/images/topfolder/firstasset.md
+*/}}
+{{- $shortkey := .Get 0 -}}           
+
+
+{{/* 1: SIZE
+size can be just width as unitless integer (like "800")
+or as two integers separated by an x to indicate complete dimensions (like "400x200") 
+*/}}
+{{- $size := .Get 1 -}} 
+{{- $width := $.Site.Params.ImageMaxWidth | default "800" -}}
+{{- $height := "" -}}
+{{- with $size -}}
+    {{- if in . "x" -}}
+        {{- $dims := split . "x" -}}
+        {{- $width = index $dims 0 -}}
+        {{- $height = index $dims (sub (len $dims) 1) -}}
+    {{- else -}}
+        {{- $width = . -}}
+    {{- end -}}
+{{- end -}}
+
+
+{{/* 2: DISPLAYS 
+displays can be any combination of string values: img,blockquote,cite,link,footer,aside
+if none are specified, defaults to all
+*/}}
+{{- $displays := .Get 2 | default "img,blockquote,cite,link,footer,aside" -}}
+
+
+{{/* 3: RESIZEANCHOR 
+DEPRECATED, likely to be phased out as unnecessary, 
+because of the responsive layout approach taken: 
+  - if only a width is specified, a resize is done with dynamic height, 
+    and an anchor is not needed
+  - if height is also specified, a proportional crop is done, 
+    and the anchor is logically always top 
+only relevant for staging/production site generation
+*/}}
+{{- $resizeAnchor := .Get 3 | default "none" -}}
+{{- if $height -}} {{- $resizeAnchor = "top" -}} {{- end -}}
+
+
+
+
+{{/* ********************************   */}}
+{{/* METADATA                           */}}
+{{/* ********************************   */}}
+
+{{/* metadata */}}
+{{- $data := index site.Data.assets $shortkey -}}
+
+{{- if not $data -}} 
+    <p><strong>Warning:</strong> No data found for key <code> {{- $shortkey -}} </code></p> 
+{{- end -}}
+
+{{- $metadata := default "" (index $data "metadata") -}}
+{{- $content := default "" (index $data "content") -}}
+
+
+
+
+{{/* ********************************   */}}
+{{/* IMAGE                              */}}
+{{/* ********************************   */}}
+
+{{/* adjust the image path to be relative to /_index.md bundle within /content (aka "/") */}}
+{{- $imgrelref := path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
+{{- $origrelref := $imgrelref -}}
+
+{{/* 
+the following styles are used in development mode to statically mimic hugo asset processing (image cropping) 
+ensuring that development is truly WYSIWYG while optimizing developmemt performance
+*/}}
+
+{{- $cropwrapperstyle := "" -}} 
+{{- $cropimgstyle := "" -}} 
+
+{{- if hugo.IsServer -}}
+
+    {{/* in development , use full path from site home (/) to statically reference files without resource processing  */}}
+    {{- $imgrelref = path.Join "/_assets" $imgrelref -}}  {{/* must have leading slash */}}          
+
+    {{/* statically mimic asset cropping, %v for type safety */}}
+    {{- if $resizeAnchor -}} 
+        {{- $cropwrapperstyle = printf "width:%vpx; height:%vpx; overflow:hidden; display:flex; align-items:self-start;" $width $height | safeCSS -}} 
+        {{- $cropimgstyle = "flex:0 0 auto" | safeCSS -}} 
+    {{- end -}}
+
+{{- else -}}
+
+    {{/* in production, use /content/_assets/_index.md as the headless page bundle for production image resources */}}
+    {{- warnf "!!!! PRODUCTION RUN, images will be resized !!!!" -}}
+
+    {{- $assets := site.GetPage "/_assets" -}}                     {{/* a headless bundle */}}
+    {{- if not $assets -}}{{- errorf "No /_assets bundle visible; check mounts/excludes" -}}{{- end -}}
+    {{- $image := $assets.Resources.Get $imgrelref -}}
+    {{- $origrelref = $image.RelPermalink -}}
+    {{- with $image -}}
+
+        {{- if eq $resizeAnchor "none" -}}
+          {{/* scale */}}
+          {{- $resize := printf "%sx%s" $width $height -}}
+          {{- $image = $image.Resize $resize -}}
+        {{- else -}}
+          {{/* crop */}}
+          {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
+          {{- $image = $image.Fill $resize -}}
+        {{- end -}}
+
+        {{- $imgrelref = $image.RelPermalink -}}
+        {{- $width = $image.Width -}}
+        {{- $height = $image.Height -}}
+
+    {{- else -}}
+        {{- errorf "No image resource at %s in bundle %s" $imgrelref $assets.Path -}} 
+    {{- end -}}
+
+{{- end -}}
+
+
+
+
+{{/* ********************************   */}}
+{{/* FIGURE                             */}}
+{{/* ********************************   */}}
+
+<figure class="image" style="max-width: {{- $width -}}px;">
+
+    {{/* IMAGE  */}}
+    {{- if in $displays "img" -}}
+    <div {{ with $cropwrapperstyle }} style="{{- . -}}" {{ end }}> {{/* with block using '-' style doesn't preserve spacing */}}
+        <img src="{{- $imgrelref -}}" width="{{- $width -}}" height="{{- $height -}}" {{- with $cropimgstyle -}} style="{{- . -}}" {{- end -}} />
+    </div>
+    {{- end -}}
+
+
+    {{/* CONTENT */}}
+    {{- if and $content (in $displays "blockquote") -}}
+        {{- $quote := $content -}}
+        {{- if .Inner -}}
+            {{- $quote = .Inner -}}
+        {{- end -}}
+        {{- with $quote -}}
+            <blockquote>{{- . | markdownify  -}}</blockquote>
+        {{- end -}}
+    {{- end -}}
+
+
+    {{/* CITATION */}}
+    {{- if or (in $displays "cite") (in $displays "link") -}}
+        <figcaption>
+            {{- if and $metadata (in $displays "cite") -}}
+                {{- partial "citation" (dict "params" $metadata "ctx" $) -}}
+            {{- end -}}
+            {{- if and $imgrelref (in $displays "link") -}}
+                {{- if $fullsizelinks -}}
+                    <a class="origversion" href="{{- $origrelref -}}">View largest available size.</a>
+                {{- end -}}
+            {{- end -}}
+        </figcaption>
+    {{- end -}}
+
+
+    {{/* FOOTER */}}
+    {{- if and $metadata (in $displays "footer") -}}
+        {{- with $metadata.footer -}}
+            <footer> {{- . | markdownify -}} </footer>
+        {{- end -}}
+    {{- end -}}
+
+
+    {{/* NOTES */}}
+    {{- if and $metadata (in $displays "aside") -}}
+        <aside>
+        {{- with $metadata.notes -}}
+            <div class="notes">{{- . | markdownify -}}</div> 
+        {{- end -}}
+        </aside>
+    {{- end -}}
+</figure>
+
+

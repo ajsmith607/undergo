@@ -13,6 +13,7 @@
         {{ partial "head-assetjs" . }}
     </head>
     <body id="{{ with .Site.Params.bodyid }}{{ . | safeHTML }}{{ end }}">
+
         {{ partial "header" . }}
         {{ block "main" . }}{{ end }}
         {{ partial "footer" . }}

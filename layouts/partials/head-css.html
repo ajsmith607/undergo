@@ -1,9 +1,13 @@
 
 {{ with resources.Match "/css/**.css" }}
-    {{ $css := (sort . "Name") | resources.Concat "css/style.css" | toCSS }}
-    {{ if hugo.IsProduction }}
-        {{ $css = $css | minify | fingerprint }}
+    {{ $css := "" }}
+    {{ if gt (len .) 0 }} 
+        {{ $css = (sort . "Name") | resources.Concat "css/style.css" | toCSS }}
+        {{ if hugo.IsServer }}
+            <link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}" />
+            <link href="/css/print.css" rel="stylesheet" media="print" />
+        {{ else }}
+            {{ $css = $css | minify | fingerprint }}
+        {{ end }}
     {{ end }}
-    <link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}" />
-    <link href="/css/print.css" rel="stylesheet" media="print" />
 {{ end }}

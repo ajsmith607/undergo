@@ -1,0 +1,22 @@
+Simple shortcode/partial design patterns.
+
+Treat shortcodes as thin controllers, only have them handle parameters, then pass along to partials for rendering output.
+
+Shortcode name: /layouts/shortcodes/<verb>-<noun>.html
+Partial name: /layout/partials/<verb>-<noun>-render.html
+
+In dev, call "partial" to optimize freshness; In production, call "partialCached" to optimize build time:
+
+{{- if hugo.IsServer -}}
+    {{- partial "fig-render.html" $ctx -}}
+{{ else -}}
+    {{- $key := printf "%s-%v-%v" $shortkey $width $height -}}
+    {{- partialCached "fig-render.html" $ctx $key -}}
+{{- end -}}
+
+All expensive operations, such as resource.Get() calls, readFile calls, image manipulation, etc. should be done in partials so that they can be cached and avoid the underlying re-processing. 
+
+Keys should have the same granularity level as the output variables, or you may get a different cached result. 
+
+See "fig[-render].html" and "block[-render].html" in /shortcodes and /partials, as examples.
+

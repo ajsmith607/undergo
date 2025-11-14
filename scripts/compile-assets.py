@@ -108,6 +108,10 @@ def main():
     parser.add_argument("--changed", type=Path, help="Optional: only re-process this file")
     args = parser.parse_args()
 
+    new_keys = []       # keys newly added (not present in prev_index)
+    modified_keys = []  # keys present but with changed mtime
+    unchanged_keys = [] # optional
+
     #config_path = Path("config.toml") 
     #print(f"Configuration file used (config_path): {str(config_path)}")
     #if not config_path.exists():
@@ -132,7 +136,7 @@ def main():
     if stale_keys:
         print("🗑️ Pruning stale entries:")
         for key in stale_keys:
-            print(f" - {key}")
+            print(f" - prune: {key}")
     
     full_cache = {
         key: entry for key, entry in full_cache.items()
@@ -171,9 +175,6 @@ def main():
         new_index = {}
         files_to_process = []
 
-        new_keys = []       # keys newly added (not present in prev_index)
-        modified_keys = []  # keys present but with changed mtime
-        unchanged_keys = [] # optional
 
         for md_file in asset_path.rglob("*.md"):
             key = getkey(md_file)
@@ -194,12 +195,12 @@ def main():
         if new_keys:
             print("🗑️ Adding new entries:")
             for new in new_keys:
-                print(f" - {new}")
+                print(f" - add: {new}")
 
         if modified_keys:
             print("🗑️ Updating modified entries:")
             for update in modified_keys:
-                print(f" - {update}")
+                print(f" - update: {update}")
 
         with ThreadPoolExecutor(max_workers=threads) as executor:
             results = list(executor.map(process_file, files_to_process))
@@ -221,9 +222,10 @@ def main():
 
         if new_keys and not full_rebuild:
             with figcode.open("w") as f:
-                f.write(f"{{{{/* {{{{< fig \"path/basename\" \"widthxheight\" \"img,blockquote,cite,link,footer,aside\" \"top\" />}}}} */}}}} (also: innersytle overrides content) \n")
+                f.write(f"{{{{/*\n {{{{< fig \"path/basename\" \"widthxheight\" \"img,blockquote,cite,link,footer,aside\" />}}}}\n (also: inner style overrides content) *\n/}}}}\n")
+                new_keys.sort()
                 for newkey in new_keys:   
-                    f.write(f"{{{{< fig \"{newkey}\" \"800\" >}}}}\n")
+                    f.write(f"{{{{< fig \"{newkey}\" \"800\" />}}}}\n")
             print(f"📁 Output fig code at {figcode}")
     else:
         print("No files to process")
