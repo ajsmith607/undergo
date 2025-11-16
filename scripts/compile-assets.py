@@ -15,12 +15,15 @@ import os
 from argparse import ArgumentParser
 from concurrent.futures import ThreadPoolExecutor
 from itertools import repeat
-
+import shutil
 
 asset_path = Path("content/_assets/images")
+publish_path = Path("docs/images")
 cache = Path("data/assets.json")
 index = Path("assets_index.json")
 figcode = Path("figstoadd.txt")
+
+path_index={}
 
 
 threads = 4
@@ -63,12 +66,11 @@ def getkey(md_path):
 # -----------------------------
 def process_file(md_path):
     md_path = Path(md_path)
-    key = getkey(md_path)
     
     # ignore any index files
     if md_path.name in {"index.md", "_index.md"}:
         print("Skipping an index file at " + str(md_path))
-        return ("", None)  # or some sentinel key
+        return ("", None) 
 
     directory = md_path.parent
     filebasename = md_path.stem
@@ -83,16 +85,26 @@ def process_file(md_path):
 
     if image:
         imgext = image.suffix[1:]
+        imgext = str(imgext).strip()
     else:
         print(f"NO IMAGE FOR - {str(md_path)}")
-        return ("", None)  # or some sentinel key
-        
+        return ("", None)
+
+    key = getkey(md_path)
+    key = str(key).strip()
+
+    fullpath = f"{key}.{imgext}"
+
     post = frontmatter.load(md_path)
     data = {
         "imgext":     imgext,
+        #"fullpath":   fullpath,
         "metadata":   post.metadata,
         "content":    post.content
     }
+
+    global path_index
+    path_index[key] = fullpath
 
     return key, data
 
@@ -109,6 +121,7 @@ def main():
     args = parser.parse_args()
 
     new_keys = []       # keys newly added (not present in prev_index)
+    new_imagepaths = []
     modified_keys = []  # keys present but with changed mtime
     unchanged_keys = [] # optional
 
@@ -178,6 +191,7 @@ def main():
 
         for md_file in asset_path.rglob("*.md"):
             key = getkey(md_file)
+            
             mtime = os.stat(md_file).st_mtime_ns  # use ns precision for stable compares
             new_index[key] = mtime
 
@@ -221,11 +235,25 @@ def main():
         print(f"📁 Index updated at {index}")
 
         if new_keys and not full_rebuild:
+            new_keys.sort()
+            global path_index
             with figcode.open("w") as f:
-                f.write(f"{{{{/*\n {{{{< fig \"path/basename\" \"widthxheight\" \"img,blockquote,cite,link,footer,aside\" />}}}}\n (also: inner style overrides content) *\n/}}}}\n")
-                new_keys.sort()
+                f.write(f"<!-- fig \"path/basename\" \"widthxheight\" \"img,blockquote,cite,link,footer,aside\" \n (also: inner style overrides content) *\n-->\n")
                 for newkey in new_keys:   
+                    relimgpath = path_index[newkey] 
+                    source_path = Path.joinpath(asset_path, relimgpath)
+
+                    if source_path.exists():
+                        target_path = Path.joinpath(publish_path, relimgpath)
+                        if not target_path.exists():
+                            print(f"Copying {source_path} → {target_path}")
+                            target_path.parent.mkdir(parents=True, exist_ok=True)
+                            shutil.copyfile(source_path, target_path)
+                    else:
+                        print(f"Source missing: {source_path}")
+
                     f.write(f"{{{{< fig \"{newkey}\" \"800\" />}}}}\n")
+
             print(f"📁 Output fig code at {figcode}")
     else:
         print("No files to process")

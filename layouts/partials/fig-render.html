@@ -32,8 +32,14 @@
 {{/* IMAGE                              */}}
 {{/* ********************************   */}}
 
-{{- $imgrelref := print $shortkey "." (index $data "imgext") -}}           
+{{- $imgrelref := path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
 {{- $origrelref := $imgrelref -}}
+
+
+{{- $static := false -}}
+{{- if hugo.IsServer -}}
+    {{- $static = true -}}
+{{- end -}}
 
 {{/* 
 the following styles are used in development mode to statically mimic hugo asset processing (image cropping) 
@@ -42,38 +48,27 @@ ensuring that development is truly WYSIWYG while optimizing developmemt performa
 {{- $cropwrapperstyle := "" -}} 
 {{- $cropimgstyle := "" -}} 
 
-{{- $static := false -}}
-{{- if hugo.IsServer -}}
-    {{- $static = true -}}
-{{- end -}}
-
 {{- if $static -}}
-    {{- $imgrelref = path.Join "/_assets/images" (print $shortkey "." (index $data "imgext")) -}}  {{/* must have leading slash */}}          
 
-    {{ $clean := strings.TrimPrefix "/" $imgrelref }}
-    {{ $fs := path.Join "content" $clean }}
-    {{ if not (fileExists $fs) }}
-        {{ warnf "STATIC IMAGE MISSING: %s" $fs }}
-    {{ end }}
-
-    {{- $origrelref = $imgrelref -}}
-    {{/* statically mimic asset cropping, %v for type safety */}}
     {{- if $resizeAnchor -}} 
-        {{ $height = "auto" }}
         {{- $cropwrapperstyle = printf "width:%vpx; height:%s; overflow:hidden; display:flex; align-items:self-start; margin:0; padding:0;" $width $height | safeCSS -}} 
         {{- $cropimgstyle = "flex:0 0 auto" | safeCSS -}} 
+        {{ $height = "auto" }}
     {{- end -}}
+
+    {{/* 
+    Static image references like this are possible in development environment because
+    compile_assets.py script copies newly added image files to publish_dir, as would be done in a full build.
+    */}}
+    {{- $imgrelref = path.Join "/" $imgrelref -}} {{/* must have leading slash */}}
+    {{- $origrelref = $imgrelref -}}
 
 {{- else -}}
 
     {{- $image := resources.Get $imgrelref -}}
     {{- with $image -}}
-
-        {{- $imgrelref = path.Join "images" (print $shortkey "." (index $data "imgext")) -}}           
-        {{- $origrelref = $image.RelPermalink -}}
-
         {{- if eq $resizeAnchor "none" -}}
-          {{/* scale */}}
+          {{/* resize */}}
           {{- $resize := printf "%sx%s" $width $height -}}
           {{- $image = $image.Resize $resize -}}
         {{- else -}}
@@ -81,11 +76,10 @@ ensuring that development is truly WYSIWYG while optimizing developmemt performa
           {{- $resize := printf "%sx%s %s" $width $height $resizeAnchor -}}
           {{- $image = $image.Fill $resize -}}
         {{- end -}}
-
-        {{- $imgrelref = $image.RelPermalink -}}
         {{- $width = $image.Width -}}
         {{- $height = $image.Height -}}
-
+        {{- $imgrelref = $image.RelPermalink -}}
+        {{- $origrelref = $image.RelPermalink -}}
     {{- else -}}
         {{- errorf "No image resource at %s" $imgrelref -}} 
     {{- end -}}

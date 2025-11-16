@@ -7,18 +7,42 @@ The primary bottle neck in version 1 was file I/O at scale, and publishing
 resources unnecessarily, generating much more HTML/XML than needed. This made
 site rebuilds in development take so long that it impacted writing 
 productivity. (See _figv1.backup comments for a fuller discussion of the 
-underlying mismatch and  tradeoffs.)
+underlying mismatch and tradeoffs.) 
+
+Improving this situation involved several tactics:
+  - An upgrade to Go and Hugo, I was a few years behind, and many performance
+    improvements had been made, and also a better ability to define reusable 
+    resources across the site, directly relevant to what I needed.
+  - I made aggressive configuration and module mounting optimizations, 
+    including shutting off automatic page generation on image metadata files.
+  - I created an asset cache in JSON format to store image metadata more
+    efficiently as pre-loaded JSON data in the site, eliminating all
+    individual resource.Get calls.
+  - I greatly optimized the fig code, splitting into shortcode and partial,
+    statically referencing the image in dev (no resource.Get calls) and only 
+    doing image manipulation in production.
+  - I implemented the idea of blocks, resusable text objects, which could
+    greatly influence future site organization, but its immediate effects
+    are to constrain both editing focus and the scope of incremental rebuilds.
+
+These changes resulted in server startups under half a second with incremental
+rebuilds under 200ms on the high end, and often much less than that. This 
+should allow me to scale the scope of the site more sustainably going forward.
+In the shorter term, it greatly reduces resistance/friction. Through this work
+I also made optimizations to many supporting scripts, nvim integration, etc.,
+that reduced overall friction with a better integrated and more efficient
+workflow.
 
 A small Python script at undergo/scripts/compile-assets.py recursively walks
-the asset file hierarchy, compiling metadata for use by the fig shortcode. By 
-leveraging Hugo's built-in data handling capabilities, all asset data in the 
-cache is automatically read once at server start-up and is then available 
-instantaneously in memory in the shortcode. 
+the asset file hierarchy, compiling YAML metadata into JSON for use by the fig 
+shortcode. By leveraging Hugo's built-in data handling capabilities, all asset
+data in the cache is automatically read once at server start-up and is then 
+available instantaneously in memory in the shortcode. 
 
 Furthermore, image manipulation functions in the shortcode are bypassed in 
 the development environment, as in that environment, bandwidth is not a 
 bottleneck, and I would prefer to optimize build performance in development 
-instead.
+instead to reduce writing resistance.
 
 (I started the cache compiling code in Go, both for consistency and performance,
 but found that it was overly complicated for what I wanted to do. There was 
@@ -44,6 +68,8 @@ The cache code is run and optimized in the following ways:
   - An inotify watcher at undergo/scripts/watch-assets.sh will trigger a
     --changed call to compile-assets.py automatically whenever a *.md  file is 
     modified.
+  - New images are copied into the publish_dir for immediate static access in
+    development environment.
    
 The fig shorcode was updated to use this cache and to be more clearly 
 organized and performance optimized overall. For example, file globbing used
@@ -51,8 +77,70 @@ in version 1 has been replaced with explicit paths in version 2.
 
 Obviously before both dev and prod builds, this cache must be refreshed.
 
-Configuration for undergo module and production build optimizations:
+On incremental index builds, the compile-assets.py script outputs basic fig 
+shortcodes for new records to a file in the top level Hugo directory called 
+figstoadd.txt. The following code triggers compile-assets from within Vi and 
+automatically pastes the generated fig shortcodes for new files below the cursor
+in the active buffer. The buffer is also automatically saved, meaning that not 
+only will Hugo automatically load the asset cache when it sees it was updated, 
+but navigatetochanged will be automatically triggered, meaning that when new 
+assets are added to the cache, they will be displayed automatically in the 
+browser.
 
+
+" <F2>: execute a bash script compile-assets.sh in PATH, 
+"       then read file stored in the shell PWD into buffer cursor location, 
+"       then write buffer
+"  — capture launch dir once, run script there, then read+write the file
+if !exists('g:startdir') | let g:startdir = expand('$PWD') | endif
+nnoremap <silent> <F2> :execute '! (cd ' . shellescape(g:startdir) . ' && compile-assets.sh)' <Bar> execute 'read ' . fnameescape(g:startdir . '/figstoadd.txt') <Bar> write<CR>
+
+
+For the paths to work, Vi should be invoked from the top level Hugo directory. 
+(Just default to doing everything from there.)
+
+The fig shortcode was further optizimized by leaving all pararmeter handling,
+(treating shortcode like a controller) and calling cached partial to render
+fig html and cache the results so it only renders once.
+
+memills.com is the reference implementation of this approach. The following
+are the necessary components, each are documented inline:
+
+  - hugo-utlities/dev.sh (runs dev server with optimized settings)
+  - memills/config/_default/config.toml
+        # an optimization that prevents Hugo from automatically copying these to publc (not needed there)
+        ignoreFiles = ["^content/_assets/.*\\.md$"] 
+
+          # override hugo default mapping to prevent unnecessary page generation in _assets
+          [[module.mounts]]
+            source = "content"
+            target = "content"
+            excludeFiles = ["_assets/**"] # intended effect: excludes all _assets .md files from automatic page generation 
+
+          # mount assets as site wide resources instead
+          # block access in BOTH dev and prod using resources.Get
+          # fig/image access in prod using resources.Get to resize, crop 
+          [[module.mounts]]
+            source = "content/_assets"
+            target = "assets"
+  - memills/config/development/config.toml
+  - undergo/scripts/compile-assets.[py,sh]
+      - builds and updates JSON asset cache
+      - copies new image files to publish_dir for immediate static access
+
+  - undergo/layouts/shortcodes/fig.html, undergo/layouts/partials/fig-render.html
+  - hugo-utilities/vim/*
+      - nvim config files including keybindings to run compile-assets.sh and
+        facilitate fig shortcode creation
+
+
+
+
+(**** PRE Hugo 0.150 version****)
+The post Hugo 0.150 changes summarized immediately above greatly simplify and 
+improve the initial approach that follows. Currently, neither _index files nor
+static mounts are needed any longer. Minimal configuration and environment 
+changes are needed. 
 
 # theming and reusable code
 [module]
@@ -140,32 +228,6 @@ caching, as most edits in that environment are one content page at a time.
 For more information on why images must be under content, see the code comments
 in version 1 of the fig shortcode: figv1.html. Inline comments in 
 layouts/shortcodes/fig.html explains usage and shortcode implementation details.
-
-On incremental index builds, the compile-assets.py script outputs basic fig 
-shortcodes for new records to a file in the top level Hugo directory called 
-figstoadd.txt. The following code triggers compile-assets from within Vi and 
-automatically pastes the generated fig shortcodes for new files below the cursor
-in the active buffer. The buffer is also automatically saved, meaning that not 
-only will Hugo automatically load the asset cache when it sees it was updated, 
-but navigatetochanged will be automatically triggered, meaning that when new 
-assets are added to the cache, they will be displayed automatically in the 
-browser.
-
-
-" <F2>: execute a bash script compile-assets.sh in PATH, 
-"       then read file stored in the shell PWD into buffer cursor location, 
-"       then write buffer
-"  — capture launch dir once, run script there, then read+write the file
-if !exists('g:startdir') | let g:startdir = expand('$PWD') | endif
-nnoremap <silent> <F2> :execute '! (cd ' . shellescape(g:startdir) . ' && compile-assets.sh)' <Bar> execute 'read ' . fnameescape(g:startdir . '/figstoadd.txt') <Bar> write<CR>
-
-
-For the paths to work, Vi should be invoked from the top level Hugo directory. 
-(Just default to doing everything from there.)
-
-The fig shortcode was further optizimized by leaving all pararmeter handling,
-(treating shortcode like a controller) and calling cached partial to render
-fig html and cache the results so it only renders once.
 
 
 
