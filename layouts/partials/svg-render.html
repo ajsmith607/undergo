@@ -1,0 +1,172 @@
+{{- /* Partial: display-svg-render.html */ -}}
+
+{{- $svgPath := .svgPath -}}
+{{- $tabList := .tabList -}}
+{{- $defaultTab := .defaultTab -}}
+{{- $page := .Page -}}
+
+{{- /* Parse tab list */ -}}
+{{- $tabs := split $tabList "," -}}
+{{- $tabCount := len $tabs -}}
+
+{{- /* Set default tab to first if not specified or invalid */ -}}
+{{- if not $defaultTab -}}
+    {{- $defaultTab = index $tabs 0 -}}
+{{- else -}}
+    {{- $found := false -}}
+    {{- range $tabs -}}
+        {{- if eq . $defaultTab -}}
+            {{- $found = true -}}
+        {{- end -}}
+    {{- end -}}
+    {{- if not $found -}}
+        {{- $defaultTab = index $tabs 0 -}}
+    {{- end -}}
+{{- end -}}
+
+{{- /* Build full paths */ -}}
+{{- $svgFullPath := path.Join "content" $svgPath -}}
+{{- $pngPath := replaceRE "\\.svg$" ".png" $svgPath -}}
+{{- $pngFullPath := path.Join "content" $pngPath -}}
+
+{{- /* Read files */ -}}
+{{- $svgContent := "" -}}
+{{- $svgExists := fileExists $svgFullPath -}}
+{{- if $svgExists -}}
+    {{- $svgContent = readFile $svgFullPath -}}
+{{- end -}}
+
+
+{{- /* Extract SVG dimensions */ -}}
+{{- $svgHeight := 600 -}}
+{{- if $svgExists -}}
+    {{- /* Try to match root SVG element's viewBox */ -}}
+    {{- $rootSvgMatch := findRE `<svg[^>]*viewBox="([^"]*)"[^>]*>` $svgContent 1 -}}
+    {{- if $rootSvgMatch -}}
+        {{- $viewBoxMatch := findRE `viewBox="[^"]*"` (index $rootSvgMatch 0) 1 -}}
+        {{- if $viewBoxMatch -}}
+            {{- $viewBox := index $viewBoxMatch 0 -}}
+            {{- $viewBox = replaceRE `viewBox="` "" $viewBox -}}
+            {{- $viewBox = replaceRE `"` "" $viewBox -}}
+            {{- $parts := split $viewBox " " -}}
+            {{- if ge (len $parts) 4 -}}
+                {{- $svgHeight = int (index $parts 3) -}}
+            {{- end -}}
+        {{- end -}}
+    {{- else -}}
+        {{- /* Fall back to height attribute on root SVG */ -}}
+        {{- $heightMatch := findRE `<svg[^>]*height="([^"]*)"[^>]*>` $svgContent 1 -}}
+        {{- if $heightMatch -}}
+            {{- $heightAttr := findRE `height="[^"]*"` (index $heightMatch 0) 1 -}}
+            {{- if $heightAttr -}}
+                {{- $height := index $heightAttr 0 -}}
+                {{- $height = replaceRE `height="` "" $height -}}
+                {{- $height = replaceRE `"` "" $height -}}
+                {{- $height = replaceRE `px` "" $height -}}
+                {{- $svgHeight = int $height -}}
+            {{- end -}}
+        {{- end -}}
+    {{- end -}}
+{{- end -}}
+
+
+{{- $pngExists := fileExists $pngFullPath -}}
+
+{{- /* Generate unique ID for this instance */ -}}
+{{- $id := printf "svg-%s" (md5 $svgPath) -}}
+
+<figure class="image svg-container">
+{{- if eq $tabCount 1 -}}
+    {{- /* Single view, no tabs */ -}}
+    {{- $tab := index $tabs 0 -}}
+    {{- if eq $tab "code" -}}
+        {{- if $svgExists -}}
+            <pre class="svg-code" style="max-height: {{ $svgHeight }}px; overflow: auto;">{{ $svgContent }}</pre>
+        {{- else -}}
+            <div class="error">Error: SVG file not found at {{ $svgPath }}</div>
+        {{- end -}}
+    {{- else if eq $tab "svg" -}}
+        {{- if $svgExists -}}
+            <div class="svg-render">{{ $svgContent | safeHTML }}</div>
+        {{- else -}}
+            <div class="error">Error: SVG file not found at {{ $svgPath }}</div>
+        {{- end -}}
+    {{- else if eq $tab "png" -}}
+        {{- if $pngExists -}}
+            <div class="svg-png">
+                <img src="{{ $pngPath | relURL }}" alt="PNG render of {{ $svgPath }}">
+            </div>
+        {{- else -}}
+            <div class="error">Error: PNG file not found at {{ $pngPath }}</div>
+        {{- end -}}
+    {{- end -}}
+{{- else -}}
+    <div class="svg-content">
+        {{- range $tabs -}}
+            {{- $isDefault := eq . $defaultTab -}}
+            {{- if eq . "code" -}}
+                <div id="{{ $id }}-code" class="svg-tab-content{{ if $isDefault }} active{{ end }}">
+                    {{- if $svgExists -}}
+                        <pre class="svg-code" style="max-height: {{ $svgHeight }}px; overflow: auto;">{{ $svgContent }}</pre>
+                    {{- else -}}
+                        <div class="error">Error: SVG file not found at {{ $svgPath }}</div>
+                    {{- end -}}
+                </div>
+            {{- else if eq . "svg" -}}
+                <div id="{{ $id }}-svg" class="svg-tab-content{{ if $isDefault }} active{{ end }}">
+                    {{- if $svgExists -}}
+                        <div class="svg-render">{{ $svgContent | safeHTML }}</div>
+                    {{- else -}}
+                        <div class="error">Error: SVG file not found at {{ $svgPath }}</div>
+                    {{- end -}}
+                </div>
+            {{- else if eq . "png" -}}
+                <div id="{{ $id }}-png" class="svg-tab-content{{ if $isDefault }} active{{ end }}">
+                    {{- if $pngExists -}}
+                        <div class="svg-png">
+                            <img src="{{ $pngPath | relURL }}" alt="PNG render of {{ $svgPath }}">
+                        </div>
+                    {{- else -}}
+                        <div class="error">Error: PNG file not found at {{ $pngPath }}</div>
+                    {{- end -}}
+                </div>
+            {{- end -}}
+        {{- end -}}
+    </div>
+    {{- /* Tabbed interface */ -}}
+    <div class="svg-tabs">
+        {{- range $tabs -}}
+            {{- $isDefault := eq . $defaultTab -}}
+            <button class="svg-tab{{ if $isDefault }} active{{ end }}" 
+                    data-tab="{{ $id }}-{{ . }}">
+                {{ . }}
+            </button>
+        {{- end -}}
+    </div>
+    
+{{- end -}}
+</figure>
+
+{{- if gt $tabCount 1 -}}
+<script>
+(function() {
+    const container = document.currentScript.previousElementSibling;
+    const tabs = container.querySelectorAll('.svg-tab');
+    const contents = container.querySelectorAll('.svg-tab-content');
+    
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-tab');
+            
+            // Remove active class from all tabs and contents
+            tabs.forEach(t => t.classList.remove('active'));
+            contents.forEach(c => c.classList.remove('active'));
+            
+            // Add active class to clicked tab and corresponding content
+            this.classList.add('active');
+            document.getElementById(targetId).classList.add('active');
+        });
+    });
+})();
+</script>
+{{- end -}}

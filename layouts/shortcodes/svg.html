@@ -1,0 +1,24 @@
+{{- /* Shortcode: svg.html */ -}}
+{{- /* Usage: {{< svg "path/to/art.svg" "code,svg,png" "svg" >}} */ -}}
+
+{{- $svgPath := .Get 0 -}}
+{{- $tabList := .Get 1 | default "svg,png,code" -}}
+{{- $defaultTab := .Get 2 | default "" -}}
+
+{{- if not $svgPath -}}
+    <div class="error">Error: SVG path required</div>
+{{- else -}}
+    {{- $ctx := dict 
+        "svgPath" $svgPath 
+        "tabList" $tabList 
+        "defaultTab" $defaultTab
+        "Page" .Page
+    -}}
+    
+    {{- if hugo.IsServer -}}
+        {{- partial "svg-render.html" $ctx -}}
+    {{- else -}}
+        {{- $key := printf "svg-%s-%s-%s" $svgPath $tabList $defaultTab -}}
+        {{- partialCached "svg-render.html" $ctx $key -}}
+    {{- end -}}
+{{- end -}}
