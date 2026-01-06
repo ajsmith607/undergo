@@ -1,0 +1,438 @@
+@charset "UTF-8";
+/* 
+ * variables can't be used in media queries
+ * so they are hard coded in the css,
+ * but kept in root to show the intended relationships
+ */
+:root {
+  --font-family: Tahoma, Verdana, Segoe, sans-serif;
+  --font-size: 20px;
+  --mobile-font-size: calc( var(--font-size) * 0.75 );
+  --line-height-unitless: 1.5;
+  --line-height: calc( var(--line-height-unitless) * 1rem);
+  --line-length: 40;
+  --left-margin: 16%;
+  --max-width: calc( var(--line-length) * 1rem );
+  --breakpoint: calc( var(--font-size) * var(--line-length) );
+  --breakpoint2: calc( var(--breakpoint) * 1.25 );
+  --background-color: #4D3636;
+  --background-color2: #664747;
+  --color: white;
+  --active-link-color: white;
+  --visited-link-color: #808080;
+  --border-color:  white; }
+
+*, *:before, *:after {
+  margin: 0;
+  padding: 0;
+  margin-bottom: var(--line-height);
+  box-sizing: border-box; }
+
+html, body {
+  background-color: var(--background-color);
+  color: var(--color);
+  font-family: var(--font-family);
+  font-size: var(--font-size);
+  line-height: var(--line-height-unitless);
+  width: 100%; }
+
+header, main, aside, footer {
+  margin: 0 auto 0 var(--left-margin);
+  padding: 0;
+  width: var(--max-width);
+  max-width: var(--max-width); }
+
+aside.toc {
+  padding-bottom: calc( var(--line-height) * 1); }
+
+header, footer {
+  padding-top: calc( var(--line-height) * 1); }
+
+/* this accounts for 16% offset above */
+@media only screen and (max-width: 1200px) {
+  header, main, aside, footer {
+    margin-left: auto; } }
+
+/* if this is overridden, styles will have to be duplicated to remain in effect */
+@media only screen and (max-width: 800px) {
+  html, body {
+    font-size: var(--mobile-font-size); } }
+
+nav#menumain, nav.tags {
+  min-width: 300px;
+  white-space: nowrap; }
+
+nav#menumain ul, nav.tags ul {
+  display: flex; }
+
+nav#menumain ul, nav#menumain ul li,
+nav.tags ul, nav.tags ul li {
+  padding: 0;
+  margin: 0; }
+
+.homelink, nav#menumain ul li,
+nav.tags ul li {
+  display: inline-block;
+  list-style-type: none;
+  margin-right: var(--line-height); }
+
+.homelink {
+  font-weight: bold; }
+
+a,
+nav a,
+h1 a, h2 a, h3 a, h4 a {
+  color: var(--active-link-color); }
+
+nav a, .copyright a,
+h1 a, h2 a, h3 a, h4 a {
+  text-decoration: none; }
+
+a:hover, nav a:hover {
+  text-decoration: underline; }
+
+a:visited, nav a:visited .copyright a:visited {
+  color: var(--active-link-color);
+  text-decoration: none; }
+
+h1, h2, h3 {
+  font-weight: normal; }
+
+h1 {
+  font-size: 2.25rem;
+  padding-top: calc( var(--line-height) * 1); }
+
+h2 {
+  font-size: 1.75rem;
+  padding-top: calc( var(--line-height) * 1);
+  margin-bottom: calc( var(--line-height) / 2); }
+
+h3, aside h1 {
+  font-size: 1.25rem;
+  padding-top: var(--line-height);
+  margin-bottom: calc( var(--line-height) / 2); }
+
+h4 {
+  font-size: 1rem;
+  font-weight: bold; }
+
+ul, ol {
+  padding-left: calc( var(--line-height) * 1.5); }
+
+ul > li > ul > li, ol > li > ol > li {
+  margin-bottom: calc( var(--line-height) * 0.5); }
+
+hr {
+  width: 62%;
+  margin-left: 0px;
+  color: var(--border-color); }
+
+blockquote {
+  max-width: 100%;
+  padding: var(--line-height) calc( var(--line-height) * 2);
+  background-color: var(--background-color2); }
+
+img, table, figure, svg, iframe, video {
+  display: block;
+  max-width: 100%;
+  vertical-align: middle;
+  border: 0;
+  -ms-interpolation-mode: bicubic; }
+
+img, table, figure, svg, video {
+  height: auto; }
+
+figure {
+  margin: calc( var(--line-height) * 2) 0; }
+
+/* testing .cols figure.image { margin: calc( var(--line-height) * 1) 0} */
+.cols figure {
+  margin: calc( var(--line-height) * 1) 0; }
+
+figure.table {
+  padding-bottom: 0; }
+
+figure.image img {
+  margin-bottom: 0; }
+
+figure blockquote, figcaption, figure footer, figure aside, main aside {
+  padding: 0 var(--line-height);
+  font-style: normal; }
+
+figure footer, figure aside, main aside {
+  padding-top: 0;
+  margin-left: 0; }
+
+/* resets style from top level footer */
+figure blockquote {
+  padding: var(--line-height); }
+
+figcaption {
+  margin: var(--line-height) 0; }
+
+figcaption a.origversion {
+  padding-left: calc( var(--line-height) * 0.5); }
+
+figure ul, figure ol {
+  padding-left: calc( var(--line-height) * 1); }
+
+cite {
+  font-style: normal;
+  /* reset of default browser style */ }
+
+.quote-only {
+  margin-bottom: calc( var(--line-height) * 2); }
+
+/* --- Ensure figure and its table behave as full-width blocks --- */
+/* 
+       As of Hugo 0.150, a change in Goldmark's rendering broke table displays
+       (likely through subtle differences in block boundary handling), 
+       and the browser dropped into “shrink-to-fit” mode for the table. 
+       Explicitly reasserting display:block and width:100% on both <figure> 
+       and its child <table>, forces it back into normal block flow.
+*/
+figure.table {
+  display: block;
+  /* not inline-table, not inline-block */
+  width: 100%;
+  margin: 1em 0;
+  /* optional */
+  padding: 0; }
+
+figure.table > table {
+  display: table;
+  /* restore normal table model */
+  width: 100%;
+  /* occupy full available width */
+  table-layout: auto;
+  /* keep natural cell sizing */
+  border-collapse: collapse; }
+
+figure.table > figcaption {
+  display: block;
+  width: 100%; }
+
+/* --- Ensure figure and its table behave as full-width blocks --- */
+pre {
+  background-color: var(--background-color2);
+  padding: calc( var(--line-height) * 1); }
+
+pre, code {
+  white-space: pre-wrap; }
+
+article .summary a.more-link {
+  display: none;
+  color: var(--color); }
+
+.hero {
+  font-size: 4rem;
+  padding-top: 1rem;
+  padding-bottom: 2rem; }
+
+.small,
+table th, table td, tfoot,
+figcaption, figure.image blockquote, figure footer, figure aside {
+  font-size: 0.75rem;
+  vertical-align: top; }
+
+table {
+  width: 100%;
+  table-layout: auto;
+  margin-top: calc( var(--line-height) * 1);
+  border-collapse: collapse;
+  border-top: 1px solid var(--border-color);
+  border-bottom: 1px solid var(--border-color); }
+
+table, table * {
+  white-space: normal;
+  /* allow wrapping, not nowrap */
+  font-size: inherit;
+  /* avoid collapsed text width */ }
+
+table tbody {
+  display: table-row-group; }
+
+table tr {
+  display: table-row;
+  border-spacing: 0;
+  border-collapse: collapse; }
+
+table td, table th {
+  display: table-cell;
+  vertical-align: top; }
+
+th {
+  font-weight: bold; }
+
+th, td {
+  line-height: var(--line-height);
+  padding: calc( var(--line-height) / 8);
+  text-align: left; }
+
+thead tr, tbody tr:nth-child(even) {
+  background-color: var(--background-color2); }
+
+dt {
+  font-weight: bold; }
+
+.meta {
+  display: none; }
+
+/* .summary .content p { display: inline; } */
+.more-link {
+  margin-left: calc( (var(--line-height) / 2)); }
+
+.hidden {
+  display: none !important; }
+
+.cols {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  column-gap: var(--line-height);
+  row-gap: 0;
+  flex-basis: content;
+  flex-grow: 1;
+  flex-shrink: 1;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin: 0;
+  padding: 0; }
+
+input, textarea, button {
+  display: block;
+  border: 0;
+  font-family: inherit;
+  font-size: inherit;
+  padding: calc( var(--line-height) / 3);
+  border-radius: calc( var(--line-height) / 3); }
+
+input {
+  width: 60%; }
+
+textarea {
+  width: 100%;
+  resize: vertical; }
+
+form .cols {
+  align-items: center; }
+
+.gist-data, .gist-meta {
+  margin-bottom: 0; }
+
+/* progress bar code from https://loading.io/css/
+ * add to documents: <div class="lds-ripple"><div></div><div></div></div> */
+.lds-ripple {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px; }
+
+.lds-ripple div {
+  position: absolute;
+  border: 4px solid #fff;
+  opacity: 1;
+  border-radius: 50%;
+  animation: lds-ripple 1s cubic-bezier(0, 0.2, 0.8, 1) infinite; }
+
+.lds-ripple div:nth-child(2) {
+  animation-delay: -0.5s; }
+
+@keyframes lds-ripple {
+  0% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 0; }
+  4.9% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 0; }
+  5% {
+    top: 36px;
+    left: 36px;
+    width: 0;
+    height: 0;
+    opacity: 1; }
+  100% {
+    top: 0px;
+    left: 0px;
+    width: 72px;
+    height: 72px;
+    opacity: 0; } }
+
+.lds-facebook {
+  display: inline-block;
+  position: relative;
+  width: 80px;
+  height: 80px; }
+
+.lds-facebook div {
+  display: inline-block;
+  position: absolute;
+  left: 8px;
+  width: 16px;
+  background: #fff;
+  animation: lds-facebook 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite; }
+
+.lds-facebook div:nth-child(1) {
+  left: 8px;
+  animation-delay: -0.24s; }
+
+.lds-facebook div:nth-child(2) {
+  left: 32px;
+  animation-delay: -0.12s; }
+
+.lds-facebook div:nth-child(3) {
+  left: 56px;
+  animation-delay: 0; }
+
+@keyframes lds-facebook {
+  0% {
+    top: 8px;
+    height: 64px; }
+  50%, 100% {
+    top: 24px;
+    height: 32px; } }
+
+/* --- SVG --- */
+.svg-tabs {
+  display: flex;
+  gap: 1em;
+  padding: 0;
+  margin: 0 auto;
+  width: fit-content; }
+
+.svg-tabs button {
+  padding: 0.25em 0.5em; }
+
+.svg-content {
+  margin-bottom: 0; }
+
+.svg-tab {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: white; }
+
+.svg-tab.active {
+  font-weight: bold; }
+
+.svg-tab-content {
+  display: none; }
+
+.svg-tab-content.active {
+  display: block; }
+
+.svg-code {
+  overflow: auto; }
+
+.error {
+  color: red;
+  padding: 1em; }
