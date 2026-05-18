@@ -1,8 +1,10 @@
 
-{{ with resources.Match "/css/**.css" }} {{ $css := "" }}
-    {{ if gt (len .) 0 }} 
-        {{ $css = (sort . "Name") | resources.Concat "css/style.css" | toCSS }}
-        {{ if not hugo.IsServer }}
+{{ with resources.Match "css/**.css" }} {{ $css := "" }}
+    {{ if gt (len .) 0 }}
+        {{ $css = (sort . "Name") | resources.Concat "css/style.css" }}
+        {{ if hugo.IsServer }}
+            {{ $css = $css | fingerprint }}
+        {{ else }}
             {{ $css = $css | minify | fingerprint }}
         {{ end }}
         <link href="{{ $css.RelPermalink }}" rel="stylesheet" integrity="{{ $css.Data.Integrity }}" />
